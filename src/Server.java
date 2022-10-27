@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Server {
-    ArrayList<Socket> socketList = new ArrayList<Socket>();
+//    ArrayList<Socket> socketList = new ArrayList<Socket>();
+    HashMap<String, Socket> socketList = new HashMap<>();
+    private String id = "";
 
     public void print(String str, Object... o) {
         System.out.printf(str, o);
@@ -15,15 +18,16 @@ public class Server {
     public Server(int port) throws IOException {
         ServerSocket srvSocket = new ServerSocket(port);
 
-        while (true) {
+        while(true) {
             print("Listening at port %d...\n", port);
             Socket clientSocket = srvSocket.accept();
 
             synchronized (socketList) {
-                socketList.add(clientSocket);
+                // check if the user logged in the account, if yes then put it in to the socket list(hashmap)
+                socketList.put(id, clientSocket);
             }
 
-            Thread t = new Thread(() -> {
+            Thread t = new Thread(()-> {
                 try {
                     serve(clientSocket);
                 } catch (IOException ex) {
@@ -31,7 +35,7 @@ public class Server {
                 }
 
                 synchronized (socketList) {
-                    socketList.remove(clientSocket);
+                    socketList.remove(id);
                 }
             });
             t.start();
@@ -46,32 +50,33 @@ public class Server {
         DataInputStream in = new DataInputStream(clientSocket.getInputStream());
         DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 
-        while (true) {
+        while(true) {
             int size = in.readInt();
-            String msg = "FORWARD: ";
-            while (size > 0) {
+            StringBuilder msg = new StringBuilder("FORWARD: ");
+            while(size > 0) {
                 int len = in.read(buffer, 0, Math.min(size, buffer.length));
-                msg += new String(buffer, 0, len);
+                msg.append(new String(buffer, 0, len));
                 size -= len;
             }
 
-            // forward(msg);
+            forward(msg.toString());
 
         }
     }
 
-    private void forward(String msg) {
+    private void forward(String msg){
         synchronized (socketList) {
-            for (Socket socket : socketList) {
-                try {
-                    DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-                    out.writeInt(msg.length());
-                    out.write(msg.getBytes(), 0, msg.length());
-                } catch (IOException ex) {
-                    print("Unable to forward message to %s:%d\n",
-                            socket.getInetAddress().getHostName(), socket.getPort());
-                }
-            }
+//            for (Socket socket : socketList) {
+//                try {
+//                    System.out.println("Socket: "+socket);
+//                    DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+//                    out.writeInt(msg.length());
+//                    out.write(msg.getBytes(), 0, msg.length());
+//                } catch (IOException ex) {
+//                    print("Unable to forward message to %s:%d\n",
+//                            socket.getInetAddress().getHostName(), socket.getPort());
+//                }
+//            }
         }
     }
 
