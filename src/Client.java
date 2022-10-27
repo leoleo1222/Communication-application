@@ -36,6 +36,7 @@ public class Client {
             // pass the username and password to the server
             // in the server it will store these information with hashmap
             // the hashmap can check if the user entered the correct password
+            System.out.println("Testing");
 
         } else if (option == 2) { // Login
             // TODO
