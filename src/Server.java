@@ -113,9 +113,8 @@ public class Server {
                     System.out.println("Msg: " + msg);
                     System.out.println("Socket: " + socketList.get(username));
 
-                    int header_size = target.length();
-                    out.writeInt(header_size);
-                    out.write(target.getBytes(), 0, header_size);
+                    out.writeInt(username.length());
+                    out.write(username.getBytes(), 0, username.length());
 
                     out.writeInt(msg.length());
                     out.write(msg.getBytes(), 0, msg.length());
