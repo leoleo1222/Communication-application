@@ -104,25 +104,21 @@ public class Server {
 
     private void forward(String msg, String target) {
         synchronized (socketList) {
-            for (String username : socketList.keySet()) {
-                try {
-                    DataOutputStream out = new DataOutputStream(socketList.get(username).getOutputStream());
 
-                    System.out.println("Username: " + username);
+                try {
+                    DataOutputStream out = new DataOutputStream(socketList.get(target).getOutputStream());
+
                     System.out.println("Target: " + target);
                     System.out.println("Msg: " + msg);
-                    System.out.println("Socket: " + socketList.get(username));
-
-                    out.writeInt(username.length());
-                    out.write(username.getBytes(), 0, username.length());
+                    System.out.println("Socket: " + socketList.get(target));
 
                     out.writeInt(msg.length());
                     out.write(msg.getBytes(), 0, msg.length());
                 } catch (IOException ex) {
                     print("Unable to forward message to %s:%d\n",
-                            socketList.get(username).getInetAddress().getHostName(), socketList.get(username).getPort());
+                            socketList.get(target).getInetAddress().getHostName(), socketList.get(target).getPort());
                 }
-            }
+
         }
     }
 
