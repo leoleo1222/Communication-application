@@ -1,6 +1,6 @@
 # Networking-project
 
-##Client sending message
+## Client sending message
 ```java
 String header = "sth";
 int header_size = header.length();
