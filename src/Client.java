@@ -9,9 +9,6 @@ public class Client {
     private static String password; // the password of the user
     public boolean status; // the online/offline status of the user
     private static boolean login_success = false;
-    Socket socket;
-    DataInputStream in;
-    DataOutputStream out;
     byte[] buffer = new byte[1024];
 
     public Client(String serverIP, int port) throws IOException {
@@ -32,8 +29,19 @@ public class Client {
             System.out.println("Input password:");
             password = sc.nextLine();
 
-            // TODO
-            // pass the username and password to the server
+            String header = "reg";
+            int header_size = header.length();
+            out.writeInt(header_size);
+            out.write(header.getBytes(), 0, header_size);
+
+            int username_size = username.length();
+            out.writeInt(username_size);
+            out.write(username.getBytes(), 0, username_size);
+
+            int password_size = password.length();
+            out.writeInt(password_size);
+            out.write(password.getBytes(), 0, password_size);
+
             // in the server it will store these information with hashmap
             // the hashmap can check if the user entered the correct password
 
@@ -75,8 +83,6 @@ public class Client {
         } catch (Exception e) {
             System.out.println("Init Client fail");
         }
-
-
     }
 
 
