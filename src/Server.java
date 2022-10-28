@@ -84,24 +84,6 @@ public class Server {
         }
     }
 
-    private StringBuilder read_header(Socket clientSocket){
-        byte[] buffer = new byte[1024];
-        StringBuilder msg = new StringBuilder("");
-        try {
-            DataInputStream in = new DataInputStream(clientSocket.getInputStream());
-            int size = in.readInt();
-            msg = new StringBuilder("");
-            while(size > 0) {
-                int len = in.read(buffer, 0, Math.min(size, buffer.length));
-                msg.append(new String(buffer, 0, len));
-                size -= len;
-            }
-        }catch (Exception e){
-            System.out.println("Fail in reading msg");
-        }
-        return msg;
-    }
-
     private StringBuilder read_txt(Socket clientSocket){
         byte[] buffer = new byte[1024];
         StringBuilder msg = new StringBuilder("");
