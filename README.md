@@ -1,13 +1,13 @@
 # Networking-project
 
-#####Client sending message
+##Client sending message
 ```java
 String header = "sth";
 int header_size = header.length();
 out.writeInt(header_size);
 out.write(header.getBytes(), 0, header_size);
 ```
-#####Server receiving message
+##Server receiving message
 ```java
 Socket clientSocket = srvSocket.accept();
 DataInputStream in = new DataInputStream(clientSocket.getInputStream());
