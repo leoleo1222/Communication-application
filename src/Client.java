@@ -43,11 +43,13 @@ public class Client {
                 // check the server if the account exist
                 // the server should have public hashmap which contain the username and password
 
-                // if it exist then login success
-                login_success = true;
-                // else fail then tell the user it is fail in the login process
+                while (true) {
+                    System.out.println("Receiver:");
+                    String header = sc.nextLine();
+                    int header_size = header.length();
+                    out.writeInt(header_size);
+                    out.write(header.getBytes(), 0, header_size);
 
-                while (login_success) {
                     System.out.println("Input message and press ENTER");
                     String message = sc.nextLine();
 

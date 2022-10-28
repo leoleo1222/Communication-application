@@ -52,11 +52,10 @@ public class Server {
                     size -= len;
                 }
                 account.put(username, password);
-                continue;
+                id = username;
             }
 
             synchronized (socketList) {
-
                 socketList.put(id, clientSocket);
             }
 
@@ -84,22 +83,31 @@ public class Server {
         DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 
         while (true) {
+            String target = "";
             int size = in.readInt();
+            while (size > 0) {
+                int len = in.read(buffer, 0, Math.min(size, buffer.length));
+                target += new String(buffer, 0, len);
+                size -= len;
+            }
+
+            size = in.readInt();
             StringBuilder msg = new StringBuilder("FORWARD: ");
             while (size > 0) {
                 int len = in.read(buffer, 0, Math.min(size, buffer.length));
                 msg.append(new String(buffer, 0, len));
                 size -= len;
             }
-            forward(msg.toString());
+            forward(msg.toString(), target);
         }
     }
 
-    private void forward(String msg) {
+    private void forward(String msg, String target) {
         synchronized (socketList) {
             for (String username : socketList.keySet()) {
                 try {
-                    System.out.println("Socket: "+ socketList.get(username));
+                    if(username.equals(target)) continue;
+                    System.out.println("From " + username + " to " + target + ": " + msg);
                     DataOutputStream out = new DataOutputStream(socketList.get(username).getOutputStream());
                     out.writeInt(msg.length());
                     out.write(msg.getBytes(), 0, msg.length());
