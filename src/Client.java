@@ -57,6 +57,25 @@ public class Client {
                     out.writeInt(size);
                     out.write(message.getBytes(), 0, size);
 
+                    // sender
+                    message = "";
+                    size = in.readInt();
+                    while(size > 0) {
+                        int len = in.read(buffer, 0, Math.min(size, buffer.length));
+                        message += new String(buffer, 0, len);
+                        size -= len;
+                    }
+
+                    // message
+                    message += ":";
+                    size = in.readInt();
+                    while(size > 0) {
+                        int len = in.read(buffer, 0, Math.min(size, buffer.length));
+                        message += new String(buffer, 0, len);
+                        size -= len;
+                    }
+
+                    System.out.println(message);
                 }
             }
         }

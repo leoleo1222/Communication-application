@@ -92,7 +92,7 @@ public class Server {
             }
 
             size = in.readInt();
-            StringBuilder msg = new StringBuilder("FORWARD: ");
+            StringBuilder msg = new StringBuilder("");
             while (size > 0) {
                 int len = in.read(buffer, 0, Math.min(size, buffer.length));
                 msg.append(new String(buffer, 0, len));
@@ -106,9 +106,17 @@ public class Server {
         synchronized (socketList) {
             for (String username : socketList.keySet()) {
                 try {
-                    if(username.equals(target)) continue;
-                    System.out.println("From " + username + " to " + target + ": " + msg);
                     DataOutputStream out = new DataOutputStream(socketList.get(username).getOutputStream());
+
+                    System.out.println("Username: " + username);
+                    System.out.println("Target: " + target);
+                    System.out.println("Msg: " + msg);
+                    System.out.println("Socket: " + socketList.get(username));
+
+                    int header_size = target.length();
+                    out.writeInt(header_size);
+                    out.write(target.getBytes(), 0, header_size);
+
                     out.writeInt(msg.length());
                     out.write(msg.getBytes(), 0, msg.length());
                 } catch (IOException ex) {
