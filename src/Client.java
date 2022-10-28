@@ -18,61 +18,46 @@ public class Client {
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         byte[] buffer = new byte[1024];
         Scanner sc = new Scanner(System.in);
-        System.out.println("1)Registration\n2)Login");
-        int option = sc.nextInt(); // choose register or login
-        sc.nextLine();
-        if (option == 1) { // Registration
-            System.out.println("=== Registration ===");
-            // input the username and password
-            System.out.println("Input username:");
-            username = sc.nextLine();
-            System.out.println("Input password:");
-            password = sc.nextLine();
+        while (true){
+            System.out.println("1)Registration\n2)Login");
+            int option = sc.nextInt(); // choose register or login
+            sc.nextLine();
+            if (option == 1) { // Registration
+                System.out.println("=== Registration ===");
+                System.out.println("Input username:");
+                username = sc.nextLine();
+                System.out.println("Input password:");
+                password = sc.nextLine();
+                String header = "reg";
+                int header_size = header.length();
+                out.writeInt(header_size);
+                out.write(header.getBytes(), 0, header_size);
+                int username_size = username.length();
+                out.writeInt(username_size);
+                out.write(username.getBytes(), 0, username_size);
+                int password_size = password.length();
+                out.writeInt(password_size);
+                out.write(password.getBytes(), 0, password_size);
+            } else if (option == 2) { // Login
+                // TODO
+                // check the server if the account exist
+                // the server should have public hashmap which contain the username and password
 
-            String header = "reg";
-            int header_size = header.length();
-            out.writeInt(header_size);
-            out.write(header.getBytes(), 0, header_size);
+                // if it exist then login success
+                login_success = true;
+                // else fail then tell the user it is fail in the login process
 
-            int username_size = username.length();
-            out.writeInt(username_size);
-            out.write(username.getBytes(), 0, username_size);
+                while (login_success) {
+                    System.out.println("Input message and press ENTER");
+                    String message = sc.nextLine();
 
-            int password_size = password.length();
-            out.writeInt(password_size);
-            out.write(password.getBytes(), 0, password_size);
+                    int size = message.length();
+                    out.writeInt(size);
+                    out.write(message.getBytes(), 0, size);
 
-            // in the server it will store the information with hashmap
-            // the hashmap can check if the user entered the correct password
-
-        } else if (option == 2) { // Login
-            // TODO
-            // check the server if the account exist
-            // the server should have public hashmap which contain the username and password
-
-            // if it exist then login success
-            login_success = true;
-            // else fail then tell the user it is fail in the login process
-            
-            while (true) {
-                System.out.println("Input message and press ENTER");
-                String message = sc.nextLine();
-
-                int size = message.length();
-                out.writeInt(size);
-                out.write(message.getBytes(), 0, size);
-
-                message = "";
-                size = in.readInt();
-                while (size > 0) {
-                    int len = in.read(buffer, 0, Math.min(size, buffer.length));
-                    message += new String(buffer, 0, len);
-                    size -= len;
                 }
-                System.out.println(message);
             }
         }
-
     }
 
     public static void main(String[] args) {
