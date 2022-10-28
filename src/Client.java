@@ -42,7 +42,7 @@ public class Client {
             out.writeInt(password_size);
             out.write(password.getBytes(), 0, password_size);
 
-            // in the server it will store these information with hashmap
+            // in the server it will store the information with hashmap
             // the hashmap can check if the user entered the correct password
 
         } else if (option == 2) { // Login
