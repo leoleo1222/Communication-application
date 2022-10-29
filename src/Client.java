@@ -9,7 +9,6 @@ public class Client {
     private static String password; // the password of the user
     public boolean status; // the online/offline status of the user
     private static boolean login_success = false;
-    byte[] buffer = new byte[1024];
 
     public Client(String serverIP, int port) throws IOException {
         System.out.printf("Connecting to %s:%d\n", serverIP, port);
@@ -18,7 +17,7 @@ public class Client {
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         byte[] buffer = new byte[1024];
         Scanner sc = new Scanner(System.in);
-        while (true){
+        while (true) {
             System.out.println("1)Registration\n2)Login");
             int option = sc.nextInt(); // choose register or login
             sc.nextLine();
@@ -42,8 +41,27 @@ public class Client {
                 // TODO
                 // check the server if the account exist
                 // the server should have public hashmap which contain the username and password
+                Thread t = new Thread(() -> {
+                    try {
+                        while (true){
+                            // message
+                            String receive = "";
+                            int r_size = in.readInt();
+                            while (r_size > 0) {
+                                int len = in.read(buffer, 0, Math.min(r_size, buffer.length));
+                                receive += new String(buffer, 0, len);
+                                r_size -= len;
+                            }
 
+                            System.out.println(receive);
+                        }
+                    } catch (Exception e) {
+                        System.out.println(e);
+                    }
+                });
+                t.start();
                 while (true) {
+
                     System.out.println("Receiver:");
                     String header = sc.nextLine();
                     int header_size = header.length();
@@ -56,17 +74,7 @@ public class Client {
                     int size = message.length();
                     out.writeInt(size);
                     out.write(message.getBytes(), 0, size);
-                    
-                    // message
-                    String receive = "";
-                    size = in.readInt();
-                    while(size > 0) {
-                        int len = in.read(buffer, 0, Math.min(size, buffer.length));
-                        receive += new String(buffer, 0, len);
-                        size -= len;
-                    }
 
-                    System.out.println(receive);
                 }
             }
         }
