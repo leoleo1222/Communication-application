@@ -53,6 +53,7 @@ public class Server {
                 }
                 account.put(username, password);
                 id = username;
+                System.out.println(id + " logged in");
             }
 
             synchronized (socketList) {
