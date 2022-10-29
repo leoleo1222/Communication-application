@@ -58,15 +58,15 @@ public class Client2 {
                     out.write(message.getBytes(), 0, size);
                     
                     // message
-                    message = "";
+                    String receive = "";
                     size = in.readInt();
                     while(size > 0) {
                         int len = in.read(buffer, 0, Math.min(size, buffer.length));
-                        message += new String(buffer, 0, len);
+                        receive += new String(buffer, 0, len);
                         size -= len;
                     }
 
-                    System.out.println(message);
+                    System.out.println(receive);
                 }
             }
         }
