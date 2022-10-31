@@ -83,14 +83,16 @@ public class Server {
         DataInputStream in = new DataInputStream(clientSocket.getInputStream());
         DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 
+        int i = 1;
+        String namelist = "User list:\n";
+        for(String username : socketList.keySet()){
+            namelist += "["+i+++"]"+username+"\n";
+        }
+        out.writeInt(namelist.length());
+        out.write(namelist.getBytes(), 0, namelist.length());
+        
         while (true) {
-            int i = 1;
-            String namelist = "User list:\n";
-            for(String username : socketList.keySet()){
-                namelist += "["+i+++"]"+username+"\n";
-            }
-            out.writeInt(namelist.length());
-            out.write(namelist.getBytes(), 0, namelist.length());
+
 
             String target = "";
             int size = in.readInt();
