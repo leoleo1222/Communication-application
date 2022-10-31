@@ -83,14 +83,16 @@ public class Server {
         DataInputStream in = new DataInputStream(clientSocket.getInputStream());
         DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 
+
         while (true) {
-            int i = 1;
-            String namelist = "User list:\n";
-            for(String username : socketList.keySet()){
-                namelist += "["+i+++"]"+username+"\n";
-            }
-            out.writeInt(namelist.length());
-            out.write(namelist.getBytes(), 0, namelist.length());
+//            int i = 1;
+//            String namelist = "User list:\n";
+//            for(String username : socketList.keySet()){
+//                namelist += "["+i+++"]"+username+"\n";
+//            }
+//            out.writeInt(namelist.length());
+//            out.write(namelist.getBytes(), 0, namelist.length());
+
 
             String target = "";
             int size = in.readInt();
@@ -114,19 +116,19 @@ public class Server {
     private void forward(String msg, String target) {
         synchronized (socketList) {
 
-                try {
-                    DataOutputStream out = new DataOutputStream(socketList.get(target).getOutputStream());
+            try {
+                DataOutputStream out = new DataOutputStream(socketList.get(target).getOutputStream());
 
-                    System.out.println("Target: " + target);
-                    System.out.println("Msg: " + msg);
-                    System.out.println("Socket: " + socketList.get(target));
+                System.out.println("Target: " + target);
+                System.out.println("Msg: " + msg);
+                System.out.println("Socket: " + socketList.get(target));
 
-                    out.writeInt(msg.length());
-                    out.write(msg.getBytes(), 0, msg.length());
-                } catch (IOException ex) {
-                    print("Unable to forward message to %s:%d\n",
-                            socketList.get(target).getInetAddress().getHostName(), socketList.get(target).getPort());
-                }
+                out.writeInt(msg.length());
+                out.write(msg.getBytes(), 0, msg.length());
+            } catch (IOException ex) {
+                print("Unable to forward message to %s:%d\n",
+                        socketList.get(target).getInetAddress().getHostName(), socketList.get(target).getPort());
+            }
 
         }
     }

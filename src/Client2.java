@@ -41,7 +41,6 @@ public class Client2 {
                 // TODO
                 // check the server if the account exist
                 // the server should have public hashmap which contain the username and password
-
                 while (true) {
 
                     System.out.println("Receiver:");
