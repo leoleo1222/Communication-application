@@ -41,25 +41,7 @@ public class Client2 {
                 // TODO
                 // check the server if the account exist
                 // the server should have public hashmap which contain the username and password
-                Thread t = new Thread(() -> {
-                    try {
-                        while (true){
-                            // message
-                            String receive = "";
-                            int r_size = in.readInt();
-                            while (r_size > 0) {
-                                int len = in.read(buffer, 0, Math.min(r_size, buffer.length));
-                                receive += new String(buffer, 0, len);
-                                r_size -= len;
-                            }
 
-                            System.out.println(receive);
-                        }
-                    } catch (Exception e) {
-                        System.out.println(e);
-                    }
-                });
-                t.start();
                 while (true) {
 
                     System.out.println("Receiver:");
@@ -77,6 +59,25 @@ public class Client2 {
 
                 }
             }
+            Thread t = new Thread(() -> {
+                try {
+                    while (true){
+                        // message
+                        String receive = "";
+                        int r_size = in.readInt();
+                        while (r_size > 0) {
+                            int len = in.read(buffer, 0, Math.min(r_size, buffer.length));
+                            receive += new String(buffer, 0, len);
+                            r_size -= len;
+                        }
+
+                        System.out.println(receive);
+                    }
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            });
+            t.start();
         }
     }
 
