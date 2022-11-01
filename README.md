@@ -8,22 +8,6 @@ Class  | Description
 Server  | Help Client to store and pass message
 Client  | Register account and sending/uploading message 
 
-##### The flow of Client
-```flow
-reg=>start: Registration
-st=>start: Login
-op=>operation: Login operation
-cond_r=>condition: Successful Yes or No?
-cond=>condition: Successful Yes or No?
-e=>end: Start sending message
-
-reg->cond_r->st->op->cond
-cond(yes)->e
-cond(no)->op
-cond_r(yes)->st
-cond_r(no)->reg
-```
-
 ###### Client sending message
 ```java
 String header = "header";
