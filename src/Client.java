@@ -43,7 +43,7 @@ public class Client {
                 // the server should have public hashmap which contain the username and password
                 while (true) {
 
-                    System.out.println("Receiver:");
+                    System.out.println("Enter a receiver name:");
                     String header = sc.nextLine();
                     int header_size = header.length();
                     out.writeInt(header_size);
@@ -60,7 +60,7 @@ public class Client {
             }
             Thread t = new Thread(() -> {
                 try {
-                    while (true){
+                    while (true) {
                         // message
                         String receive = "";
                         int r_size = in.readInt();

@@ -85,13 +85,13 @@ public class Server {
 
 
         while (true) {
-//            int i = 1;
-//            String namelist = "User list:\n";
-//            for(String username : socketList.keySet()){
-//                namelist += "["+i+++"]"+username+"\n";
-//            }
-//            out.writeInt(namelist.length());
-//            out.write(namelist.getBytes(), 0, namelist.length());
+            int i = 1;
+            String namelist = "";
+            for (String username : socketList.keySet()) {
+                namelist += "[" + i++ + "]" + username + "\n";
+            }
+            out.writeInt(namelist.length());
+            out.write(namelist.getBytes(), 0, namelist.length());
 
 
             String target = "";
