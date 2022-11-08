@@ -1,6 +1,4 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -114,6 +112,20 @@ public class Server {
                 forward(msg.toString(), target);
             else {
                 System.out.println(target + " msg will store to a file");
+
+//                File file = new File(target);
+//
+//                FileOutputStream out_file = new FileOutputStream(file);
+//
+//
+//                int len = in.read(buffer, 0, buffer.length);
+//                String str = new String(buffer, 0, len);
+//
+//                out_file.write(buffer, 0, len);
+//
+//                out_file.flush();
+//                out_file.close();
+//                in.close();
             }
         }
     }
