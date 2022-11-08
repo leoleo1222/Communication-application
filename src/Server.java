@@ -110,10 +110,11 @@ public class Server {
                 msg.append(new String(buffer, 0, len));
                 size -= len;
             }
-            if(socketList.containsKey(target))
+            if (socketList.containsKey(target))
                 forward(msg.toString(), target);
-            else
-                System.out.println(target + " is offline");
+            else {
+                System.out.println(target + " msg will store to a file");
+            }
         }
     }
 
