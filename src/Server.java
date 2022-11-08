@@ -68,6 +68,7 @@ public class Server {
                 }
 
                 synchronized (socketList) {
+                    System.out.println(id + " is offline");
                     socketList.remove(id);
                 }
             });
@@ -109,7 +110,10 @@ public class Server {
                 msg.append(new String(buffer, 0, len));
                 size -= len;
             }
-            forward(msg.toString(), target);
+            if(socketList.containsKey(target))
+                forward(msg.toString(), target);
+            else
+                System.out.println(target + " is offline");
         }
     }
 
