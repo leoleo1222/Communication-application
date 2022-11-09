@@ -42,29 +42,21 @@ public class Client {
                 // check the server if the account exist
                 // the server should have public hashmap which contain the username and password
                 while (true) {
-
-                        System.out.println("Enter a receiver name:");
-                        String header = sc.nextLine();
-                        int header_size = header.length();
-                        out.writeInt(header_size);
-                        out.write(header.getBytes(), 0, header_size);
-
-                        System.out.println("Input message and press ENTER");
-                        String message = sc.nextLine();
-
-                        int size = message.length();
-                        out.writeInt(size);
-                        out.write(message.getBytes(), 0, size);
-
-
-
-
+                    System.out.println("Enter a receiver name:");
+                    String header = sc.nextLine();
+                    int header_size = header.length();
+                    out.writeInt(header_size);
+                    out.write(header.getBytes(), 0, header_size);
+                    System.out.println("Input message and press ENTER");
+                    String message = sc.nextLine();
+                    int size = message.length();
+                    out.writeInt(size);
+                    out.write(message.getBytes(), 0, size);
                 }
             }
             Thread t = new Thread(() -> {
                 try {
                     while (true) {
-                        // message
                         String receive = "";
                         int r_size = in.readInt();
                         while (r_size > 0) {
@@ -76,7 +68,7 @@ public class Client {
                         System.out.println(receive);
                     }
                 } catch (Exception e) {
-                    System.out.println("Sent to offline user");
+                    System.out.println("");
                 }
             });
             t.start();
