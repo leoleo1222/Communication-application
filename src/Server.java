@@ -101,31 +101,27 @@ public class Server {
                 size -= len;
             }
 
+
             size = in.readInt();
             StringBuilder msg = new StringBuilder("");
             while (size > 0) {
                 int len = in.read(buffer, 0, Math.min(size, buffer.length));
                 msg.append(new String(buffer, 0, len));
+                if(!socketList.containsKey(target) && account.containsKey(target)){
+                    File file = new File(target + ".txt");
+                    FileOutputStream out_file = new FileOutputStream(file);
+                    System.out.println("Saved into " + target);
+                    out_file.write(buffer, 0, len);
+                    out_file.flush();
+                    out_file.close();
+                    in.close();
+                }
                 size -= len;
             }
             if (socketList.containsKey(target))
                 forward(msg.toString(), target);
             else {
                 System.out.println(target + " msg will store to a file");
-
-//                File file = new File(target);
-//
-//                FileOutputStream out_file = new FileOutputStream(file);
-//
-//
-//                int len = in.read(buffer, 0, buffer.length);
-//                String str = new String(buffer, 0, len);
-//
-//                out_file.write(buffer, 0, len);
-//
-//                out_file.flush();
-//                out_file.close();
-//                in.close();
             }
         }
     }

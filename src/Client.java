@@ -43,18 +43,21 @@ public class Client {
                 // the server should have public hashmap which contain the username and password
                 while (true) {
 
-                    System.out.println("Enter a receiver name:");
-                    String header = sc.nextLine();
-                    int header_size = header.length();
-                    out.writeInt(header_size);
-                    out.write(header.getBytes(), 0, header_size);
+                        System.out.println("Enter a receiver name:");
+                        String header = sc.nextLine();
+                        int header_size = header.length();
+                        out.writeInt(header_size);
+                        out.write(header.getBytes(), 0, header_size);
 
-                    System.out.println("Input message and press ENTER");
-                    String message = sc.nextLine();
+                        System.out.println("Input message and press ENTER");
+                        String message = sc.nextLine();
 
-                    int size = message.length();
-                    out.writeInt(size);
-                    out.write(message.getBytes(), 0, size);
+                        int size = message.length();
+                        out.writeInt(size);
+                        out.write(message.getBytes(), 0, size);
+
+
+
 
                 }
             }
@@ -73,7 +76,7 @@ public class Client {
                         System.out.println(receive);
                     }
                 } catch (Exception e) {
-                    System.out.println(e);
+                    System.out.println("Sent to offline user");
                 }
             });
             t.start();
