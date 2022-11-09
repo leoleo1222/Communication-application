@@ -115,6 +115,8 @@ public class Server {
                     out_file.flush();
                     out_file.close();
                     in.close();
+                    System.out.println("File msg: " + target);
+                    printfile(file);
                 }
                 size -= len;
             }
@@ -144,6 +146,28 @@ public class Server {
             }
 
         }
+    }
+
+    private void printfile(File file){
+        try{
+
+        FileInputStream in = new FileInputStream(file);
+        long size = file.length();
+        byte[] buffer = new byte[1024];
+
+        while (size > 0) {
+            int len = in.read(buffer, 0, buffer.length);
+            size -= len;
+
+            System.out.println(new String(buffer, 0, len));
+        }
+
+        in.close();
+        }catch (Exception e){
+
+        }
+
+
     }
 
     public static void main(String[] args) throws IOException {
