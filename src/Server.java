@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Server {
-    //    ArrayList<Socket> socketList = new ArrayList<Socket>();
+    // this store the online user with their socket
     HashMap<String, Socket> socketList = new HashMap<>();
-
+    // this store their account information, we can check if the account exist with containsKey(..)
     HashMap<String, String> account = new HashMap<>();
+    // id = username, in case i want to user it through method, i put it in a static var.
     private static String id = "";
 
     public void print(String str, Object... o) {
@@ -32,9 +33,9 @@ public class Server {
                 header += new String(buffer, 0, len);
                 size -= len;
             }
-
-            // registration process
+            // registration process start
             if (header.startsWith("reg")) {
+                // get username
                 String username = "";
                 size = in.readInt();
                 while (size > 0) {
@@ -42,6 +43,7 @@ public class Server {
                     username += new String(buffer, 0, len);
                     size -= len;
                 }
+                // get password
                 String password = "";
                 size = in.readInt();
                 while (size > 0) {
@@ -49,24 +51,31 @@ public class Server {
                     password += new String(buffer, 0, len);
                     size -= len;
                 }
+                // register the account
                 account.put(username, password);
+                // put the username into the static var.
                 id = username;
+                // print out the log in username in server side for debug use
                 System.out.println(id + " logged in");
             }
 
             synchronized (socketList) {
+                // let the user online
                 socketList.put(id, clientSocket);
             }
 
             Thread t = new Thread(() -> {
                 try {
+                    // start passing msg with the server
                     serve(clientSocket);
                 } catch (IOException ex) {
                     print("Connection drop!");
                 }
 
                 synchronized (socketList) {
+                    // print out the log out username in server side for debug use
                     System.out.println(id + " is offline");
+                    // let the user offline
                     socketList.remove(id);
                 }
             });
@@ -84,6 +93,8 @@ public class Server {
 
 
         while (true) {
+            // not necessary, just telling the client list to the client side
+            // further development: client can ask for the client list with some command (input: showList)
             int i = 1;
             String namelist = "";
             for (String username : socketList.keySet()) {
@@ -91,8 +102,7 @@ public class Server {
             }
             out.writeInt(namelist.length());
             out.write(namelist.getBytes(), 0, namelist.length());
-
-
+            // receiving the msg target from the client
             String target = "";
             int size = in.readInt();
             while (size > 0) {
@@ -100,10 +110,9 @@ public class Server {
                 target += new String(buffer, 0, len);
                 size -= len;
             }
-
-
-            size = in.readInt();
+            // receiving the msg from the client
             StringBuilder msg = new StringBuilder("");
+            size = in.readInt();
             while (size > 0) {
                 int len = in.read(buffer, 0, Math.min(size, buffer.length));
                 msg.append(new String(buffer, 0, len));
@@ -115,14 +124,13 @@ public class Server {
                     out_file.flush();
                     out_file.close();
                     in.close();
-                    System.out.println("File msg: " + target);
-                    printfile(file);
                 }
                 size -= len;
             }
             if (socketList.containsKey(target))
                 forward(msg.toString(), target);
             else {
+                // This is a debug msg, it will show when the receiver is offline
                 System.out.println(target + " msg will store to a file");
             }
         }
@@ -132,12 +140,13 @@ public class Server {
         synchronized (socketList) {
 
             try {
+                // the socket list will be the target socket == socketList.get(target)
                 DataOutputStream out = new DataOutputStream(socketList.get(target).getOutputStream());
-
+                // msg show in server side telling the msg detail in each time client forwarding msg
                 System.out.println("Target: " + target);
                 System.out.println("Msg: " + msg);
                 System.out.println("Socket: " + socketList.get(target));
-
+                // send the msg
                 out.writeInt(msg.length());
                 out.write(msg.getBytes(), 0, msg.length());
             } catch (IOException ex) {
@@ -148,7 +157,7 @@ public class Server {
         }
     }
 
-    private void printfile(File file){
+    private void print_file(File file){
         try{
 
         FileInputStream in = new FileInputStream(file);
@@ -164,7 +173,7 @@ public class Server {
 
         in.close();
         }catch (Exception e){
-
+            System.out.println("Error in getting file data");
         }
 
 
