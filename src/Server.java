@@ -91,17 +91,6 @@ public class Server {
         DataInputStream in = new DataInputStream(clientSocket.getInputStream());
         DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 
-        // extract offline receiver received data
-        for(String username : socketList.keySet()){
-            if(new File(username + ".txt").exists() && socketList.containsKey(username)){
-                String offline_msg = get_offline_data(new File(username + ".txt"));
-                forward(offline_msg, username);
-                if(new File(username + ".txt").delete())
-                    System.out.println("Deleted " + username +"'s offline data file");
-                else
-                    System.out.println("Fail to delete " + username +"'s offline data file");
-            }
-        }
 
         while (true) {
             // not necessary, just telling the client list to the client side
@@ -137,6 +126,17 @@ public class Server {
                     in.close();
                 }
                 size -= len;
+            }
+            // extract data from offline file data
+            for(String username : socketList.keySet()){
+                if(new File(username + ".txt").exists() && socketList.containsKey(username)){
+                    String offline_msg = get_offline_data(new File(username + ".txt"));
+                    forward(offline_msg, username);
+                    if(new File(username + ".txt").delete())
+                        System.out.println("Deleted " + username +"'s offline data file");
+                    else
+                        System.out.println("Fail to delete " + username +"'s offline data file");
+                }
             }
 
             if (socketList.containsKey(target))
