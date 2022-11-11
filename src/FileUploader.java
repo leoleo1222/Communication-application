@@ -13,8 +13,8 @@ public class FileUploader {
     public static void main(String[] args) throws IOException {
         Scanner scanner = new Scanner(System.in);
         print("Input the server IP and port number:\n");
-        String serverIP = scanner.nextLine();
-        int port = Integer.parseInt(scanner.nextLine());
+        String serverIP = "127.0.0.1";
+        int port = 5556;
 
         print("Input the file path:\n");
         String filepath = scanner.nextLine();
