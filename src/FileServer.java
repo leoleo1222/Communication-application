@@ -41,7 +41,7 @@ public class FileServer {
             remain -= len;
         }
 
-        File file = new File(System.currentTimeMillis() + "_" + filename);
+        File file = new File( filename + "_"+System.currentTimeMillis() );
         FileOutputStream fout = new FileOutputStream(file);
 
         long size = in.readLong();
