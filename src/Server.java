@@ -69,7 +69,7 @@ public class Server {
                     // start passing msg with the server
                     serve(clientSocket);
                 } catch (IOException ex) {
-                    print("Connection drop!");
+                    System.out.println("Connection drop!");
                 }
 
                 synchronized (socketList) {
@@ -91,6 +91,17 @@ public class Server {
         DataInputStream in = new DataInputStream(clientSocket.getInputStream());
         DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 
+        // extract offline receiver received data
+        for(String username : socketList.keySet()){
+            if(new File(username + ".txt").exists() && socketList.containsKey(username)){
+                String offline_msg = get_offline_data(new File(username + ".txt"));
+                forward(offline_msg, username);
+                if(new File(username + ".txt").delete())
+                    System.out.println("Deleted " + username +"'s offline data file");
+                else
+                    System.out.println("Fail to delete " + username +"'s offline data file");
+            }
+        }
 
         while (true) {
             // not necessary, just telling the client list to the client side
@@ -127,6 +138,7 @@ public class Server {
                 }
                 size -= len;
             }
+
             if (socketList.containsKey(target))
                 forward(msg.toString(), target);
             else {
@@ -157,9 +169,9 @@ public class Server {
         }
     }
 
-    private void print_file(File file){
+    private String get_offline_data(File file){
+        String res = "";
         try{
-
         FileInputStream in = new FileInputStream(file);
         long size = file.length();
         byte[] buffer = new byte[1024];
@@ -167,16 +179,15 @@ public class Server {
         while (size > 0) {
             int len = in.read(buffer, 0, buffer.length);
             size -= len;
-
-            System.out.println(new String(buffer, 0, len));
+            res += new String(buffer, 0, len);
         }
 
         in.close();
+        return res;
         }catch (Exception e){
             System.out.println("Error in getting file data");
         }
-
-
+        return res;
     }
 
     public static void main(String[] args) throws IOException {
