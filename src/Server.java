@@ -91,17 +91,35 @@ public class Server {
         DataInputStream in = new DataInputStream(clientSocket.getInputStream());
         DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 
+        Thread t = new Thread(() -> {
+            try {
+                // extract data from offline file data
+                for (String username : socketList.keySet()) {
+                    if (new File(username + ".txt").exists() && socketList.containsKey(username)) {
+                        String offline_msg = get_offline_data(new File(username + ".txt"));
+                        forward(offline_msg, username);
+                        if (new File(username + ".txt").delete())
+                            System.out.println("Deleted " + username + "'s offline data file");
+                        else
+                            System.out.println("Fail to delete " + username + "'s offline data file");
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        });
+        t.start();
 
         while (true) {
             // not necessary, just telling the client list to the client side
             // further development: client can ask for the client list with some command (input: showList)
-            int i = 1;
-            String namelist = "";
-            for (String username : socketList.keySet()) {
-                namelist += "[" + i++ + "]" + username + "\n";
-            }
-            out.writeInt(namelist.length());
-            out.write(namelist.getBytes(), 0, namelist.length());
+//            int i = 1;
+//            StringBuilder name_list = new StringBuilder();
+//            for (String username : socketList.keySet()) {
+//                name_list.append("[").append(i++).append("]").append(username).append("\n");
+//            }
+//            out.writeInt(name_list.length());
+//            out.write(name_list.toString().getBytes(), 0, name_list.length());
             // receiving the msg target from the client
             String target = "";
             int size = in.readInt();
@@ -116,7 +134,7 @@ public class Server {
             while (size > 0) {
                 int len = in.read(buffer, 0, Math.min(size, buffer.length));
                 msg.append(new String(buffer, 0, len));
-                if(!socketList.containsKey(target) && account.containsKey(target)){
+                if (!socketList.containsKey(target) && account.containsKey(target)) {
                     File file = new File(target + ".txt");
                     FileOutputStream out_file = new FileOutputStream(file);
                     System.out.println("Saved into " + target);
@@ -126,17 +144,6 @@ public class Server {
                     in.close();
                 }
                 size -= len;
-            }
-            // extract data from offline file data
-            for(String username : socketList.keySet()){
-                if(new File(username + ".txt").exists() && socketList.containsKey(username)){
-                    String offline_msg = get_offline_data(new File(username + ".txt"));
-                    forward(offline_msg, username);
-                    if(new File(username + ".txt").delete())
-                        System.out.println("Deleted " + username +"'s offline data file");
-                    else
-                        System.out.println("Fail to delete " + username +"'s offline data file");
-                }
             }
 
             if (socketList.containsKey(target))
@@ -169,22 +176,22 @@ public class Server {
         }
     }
 
-    private String get_offline_data(File file){
+    private String get_offline_data(File file) {
         String res = "";
-        try{
-        FileInputStream in = new FileInputStream(file);
-        long size = file.length();
-        byte[] buffer = new byte[1024];
+        try {
+            FileInputStream in = new FileInputStream(file);
+            long size = file.length();
+            byte[] buffer = new byte[1024];
 
-        while (size > 0) {
-            int len = in.read(buffer, 0, buffer.length);
-            size -= len;
-            res += new String(buffer, 0, len);
-        }
+            while (size > 0) {
+                int len = in.read(buffer, 0, buffer.length);
+                size -= len;
+                res += new String(buffer, 0, len);
+            }
 
-        in.close();
-        return res;
-        }catch (Exception e){
+            in.close();
+            return res;
+        } catch (Exception e) {
             System.out.println("Error in getting file data");
         }
         return res;
