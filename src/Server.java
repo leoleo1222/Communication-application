@@ -139,6 +139,7 @@ public class Server {
                     FileOutputStream out_file = new FileOutputStream(file, true);
                     System.out.println("Saved into " + target);
                     out_file.write(buffer, 0, len);
+                    out_file.write('\n');
                     out_file.flush();
                     out_file.close();
                 }
