@@ -52,7 +52,7 @@ public class Server {
                     size -= len;
                 }
                 // register the account
-                account.put(username, password);
+                if(!account.containsKey(username)) account.put(username, password);
                 // put the username into the static var.
                 id = username;
                 // print out the log in username in server side for debug use
