@@ -136,7 +136,7 @@ public class Server {
                 msg.append(new String(buffer, 0, len));
                 if (!socketList.containsKey(target) && account.containsKey(target)) {
                     File file = new File(target + ".txt");
-                    FileOutputStream out_file = new FileOutputStream(file);
+                    FileOutputStream out_file = new FileOutputStream(file, true);
                     System.out.println("Saved into " + target);
                     out_file.write(buffer, 0, len);
                     out_file.flush();
