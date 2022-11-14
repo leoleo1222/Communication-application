@@ -68,7 +68,7 @@ public class Client {
                         System.out.println(receive);
                     }
                 } catch (Exception e) {
-                    System.out.println("");
+                    System.out.println("Error msg in receiving: "+e.getMessage());
                 }
             });
             t.start();
