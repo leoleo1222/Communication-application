@@ -7,8 +7,6 @@ import java.util.Scanner;
 public class Client2 {
     public static String username; // the username of the user
     private static String password; // the password of the user
-    public boolean status; // the online/offline status of the user
-    private static boolean login_success = false;
 
     public Client2(String serverIP, int port) throws IOException {
         System.out.printf("Connecting to %s:%d\n", serverIP, port);
@@ -23,32 +21,43 @@ public class Client2 {
             sc.nextLine();
             if (option == 1) { // Registration
                 System.out.println("=== Registration ===");
+                // input the username
                 System.out.println("Input username:");
                 username = sc.nextLine();
+                // input the password
                 System.out.println("Input password:");
                 password = sc.nextLine();
+                // save the head as reg, it means the sending msg is a registration msg
                 String header = "reg";
+                // send the header to the server
                 int header_size = header.length();
                 out.writeInt(header_size);
                 out.write(header.getBytes(), 0, header_size);
+                // send the username to the server
                 int username_size = username.length();
                 out.writeInt(username_size);
                 out.write(username.getBytes(), 0, username_size);
+                // send the password to the server
                 int password_size = password.length();
                 out.writeInt(password_size);
                 out.write(password.getBytes(), 0, password_size);
-            } else if (option == 2) { // Login
+            }
+            if (option == 2) { // Login
                 // TODO
                 // check the server if the account exist
                 // the server should have public hashmap which contain the username and password
-                while (true) {
+                while (true) { // sending msg
+                    // the sender should send out the receiver name to the server, and this let the server know who you want to send
                     System.out.println("Enter a receiver name:");
                     String header = sc.nextLine();
+                    // send the header to the server
                     int header_size = header.length();
                     out.writeInt(header_size);
                     out.write(header.getBytes(), 0, header_size);
+                    // input the msg
                     System.out.println("Input message and press ENTER");
                     String message = sc.nextLine();
+                    // send the message to the server
                     int size = message.length();
                     out.writeInt(size);
                     out.write(message.getBytes(), 0, size);
@@ -56,7 +65,7 @@ public class Client2 {
             }
             Thread t = new Thread(() -> {
                 try {
-                    while (true) {
+                    while (true) { // receiving msg
                         String receive = "";
                         int r_size = in.readInt();
                         while (r_size > 0) {
@@ -68,7 +77,7 @@ public class Client2 {
                         System.out.println(receive);
                     }
                 } catch (Exception e) {
-                    System.out.println("");
+                    System.out.println("Error msg in receiving: "+e.getMessage());
                 }
             });
             t.start();
