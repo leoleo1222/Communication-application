@@ -141,7 +141,6 @@ public class Server {
                     out_file.write(buffer, 0, len);
                     out_file.flush();
                     out_file.close();
-                    in.close();
                 }
                 size -= len;
             }

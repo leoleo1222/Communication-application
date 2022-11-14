@@ -78,7 +78,7 @@ public class Client {
                         System.out.println(receive);
                     }
                 } catch (Exception e) {
-                    System.out.println("Error msg in receiving: "+e.getMessage());
+                    e.printStackTrace();
                 }
             });
             t.start();
