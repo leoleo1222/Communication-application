@@ -22,49 +22,26 @@ public class Server {
         while (true) {
             print("Listening at port %d...\n", port);
             Socket clientSocket = srvSocket.accept();
-
             // reading the header
             DataInputStream in = new DataInputStream(clientSocket.getInputStream());
-            byte[] buffer = new byte[1024];
-            String header = "";
-            int size = in.readInt();
-            while (size > 0) {
-                int len = in.read(buffer, 0, Math.min(size, buffer.length));
-                header += new String(buffer, 0, len);
-                size -= len;
-            }
+            String header = receiveString(in);
             // registration process start
             if (header.equals("reg")) {
                 // get username
-                String username = "";
-                size = in.readInt();
-                while (size > 0) {
-                    int len = in.read(buffer, 0, Math.min(size, buffer.length));
-                    username += new String(buffer, 0, len);
-                    size -= len;
-                }
+                String username = receiveString(in);
                 // get password
-                String password = "";
-                size = in.readInt();
-                while (size > 0) {
-                    int len = in.read(buffer, 0, Math.min(size, buffer.length));
-                    password += new String(buffer, 0, len);
-                    size -= len;
-                }
+                String password = receiveString(in);
                 DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
                 // register the account
-                if(!account.containsKey(username)) {
+                if (!account.containsKey(username)) {
                     account.put(username, password);
-                    // send to client reg
-                    sendString("reg success",out);
-                }else{
+                    sendString(password, out);
+                } else {
                     sendString(account.get(username), out);
-                    // send to client log in success
-                    sendString("login success",out);
                 }
                 // put the username into the static var.
                 id = username;
-                // print out the log in username in server side for debug use
+                // print out the login username in server side for debug use
                 System.out.println(id + " logged in");
             }
 
@@ -82,7 +59,7 @@ public class Server {
                 }
 
                 synchronized (socketList) {
-                    // print out the log out username in server side for debug use
+                    // print out the logout username in server side for debug use
                     System.out.println(id + " is offline");
                     // let the user offline
                     socketList.remove(id);
@@ -166,7 +143,7 @@ public class Server {
                 forward(msg.toString(), target, type);
             else {
                 // This is a debug msg, it will show when the receiver is offline
-                if(account.containsKey(target)) System.out.println(target + " msg will store to a file");
+                if (account.containsKey(target)) System.out.println(target + " msg will store to a file");
             }
         }
     }
@@ -226,17 +203,17 @@ public class Server {
         return res;
     }
 
-    public String receiveString(DataInputStream in){
+    public String receiveString(DataInputStream in) {
         String res = "";
-        try{
+        try {
             byte[] buffer = new byte[1024];
             int len = in.readInt();
-            while(len > 0){
-                int l = in.read(buffer,0,Math.min(len,buffer.length));
-                res+=new String(buffer,0,l);
-                len-=l;
+            while (len > 0) {
+                int l = in.read(buffer, 0, Math.min(len, buffer.length));
+                res += new String(buffer, 0, l);
+                len -= l;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return res;

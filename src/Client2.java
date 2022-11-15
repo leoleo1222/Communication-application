@@ -16,7 +16,7 @@ public class Client2 {
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         byte[] buffer = new byte[1024];
         Scanner sc = new Scanner(System.in);
-        while (true) {
+        do {
             System.out.println("Registration/Login");
             // input the username
             System.out.println("Input username:");
@@ -29,6 +29,8 @@ public class Client2 {
             sendString(header, out);
             sendString(username, out);
             sendString(password, out);
+        } while (!receiveString(in).equals(password));
+        while (true) {
             Thread t = new Thread(() -> {
                 try {
                     while (true) { // receiving msg
@@ -48,18 +50,36 @@ public class Client2 {
             });
             t.start();
             while (true) { // sending msg
-                header = "single";
-                sendString(header, out);
-                System.out.println("Enter a receiver name:");
-                String receiver = sc.nextLine();
-                sendString(receiver, out);
-                System.out.println("Input message and press ENTER");
-                String message = sc.nextLine();
-                sendString(message, out);
+                directMsg(out, sc);
             }
-
-
         }
+    }
+
+    private void directMsg(DataOutputStream out, Scanner sc) {
+        String header = "single";
+        sendString(header, out);
+        System.out.println("Enter a receiver name:");
+        String receiver = sc.nextLine();
+        sendString(receiver, out);
+        System.out.println("Input message and press ENTER");
+        String message = sc.nextLine();
+        sendString(message, out);
+    }
+
+    public String receiveString(DataInputStream in) {
+        String res = "";
+        try {
+            byte[] buffer = new byte[1024];
+            int len = in.readInt();
+            while (len > 0) {
+                int l = in.read(buffer, 0, Math.min(len, buffer.length));
+                res += new String(buffer, 0, l);
+                len -= l;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 
     public void sendString(String str, DataOutputStream out) {
