@@ -17,38 +17,18 @@ public class Client2 {
         byte[] buffer = new byte[1024];
         Scanner sc = new Scanner(System.in);
         while (true) {
-            System.out.println("1)Registration\n2)Login");
-            int option = sc.nextInt(); // choose register or login
-            sc.nextLine();
-            if (option == 1) { // Registration
-                System.out.println("=== Registration ===");
-                // input the username
-                System.out.println("Input username:");
-                username = sc.nextLine();
-                // input the password
-                System.out.println("Input password:");
-                password = sc.nextLine();
-                // send the header as reg, it means the sending msg is a registration msg
-                String header = "reg";
-                sendString(header, out);
-                sendString(username, out);
-                sendString(password, out);
-            }
-            if (option == 2) { // Login
-                // TODO
-                // check the server if the account exist
-                // the server should have public hashmap which contain the username and password
-                while (true) { // sending msg
-                    String header = "single";
-                    sendString(header, out);
-                    System.out.println("Enter a receiver name:");
-                    String receiver = sc.nextLine();
-                    sendString(receiver, out);
-                    System.out.println("Input message and press ENTER");
-                    String message = sc.nextLine();
-                    sendString(message, out);
-                }
-            }
+            System.out.println("Registration/Login");
+            // input the username
+            System.out.println("Input username:");
+            username = sc.nextLine();
+            // input the password
+            System.out.println("Input password:");
+            password = sc.nextLine();
+            // send the header as reg, it means the sending msg is a registration msg
+            String header = "reg";
+            sendString(header, out);
+            sendString(username, out);
+            sendString(password, out);
             Thread t = new Thread(() -> {
                 try {
                     while (true) { // receiving msg
@@ -67,6 +47,18 @@ public class Client2 {
                 }
             });
             t.start();
+            while (true) { // sending msg
+                header = "single";
+                sendString(header, out);
+                System.out.println("Enter a receiver name:");
+                String receiver = sc.nextLine();
+                sendString(receiver, out);
+                System.out.println("Input message and press ENTER");
+                String message = sc.nextLine();
+                sendString(message, out);
+            }
+
+
         }
     }
 
@@ -88,7 +80,7 @@ public class Client2 {
         try {
             new Client(serverIP, port);
         } catch (Exception e) {
-            System.out.println("Init Client fail");
+            e.printStackTrace();
         }
     }
 

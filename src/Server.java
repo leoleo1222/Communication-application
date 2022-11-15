@@ -51,8 +51,16 @@ public class Server {
                     password += new String(buffer, 0, len);
                     size -= len;
                 }
+                DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
                 // register the account
-                if(!account.containsKey(username)) account.put(username, password);
+                if(!account.containsKey(username)) {
+                    account.put(username, password);
+                    // send to client reg
+                    sendString("reg success",out);
+                }else{
+                    // send to client log in success
+                    sendString("login success",out);
+                }
                 // put the username into the static var.
                 id = username;
                 // print out the log in username in server side for debug use
@@ -181,6 +189,18 @@ public class Server {
                         socketList.get(target).getInetAddress().getHostName(), socketList.get(target).getPort());
             }
 
+        }
+    }
+
+    public void sendString(String str, DataOutputStream out) {
+        try {
+            // send the header to the server
+            int size = str.length();
+            out.writeInt(size);
+            out.write(str.getBytes(), 0, size);
+            out.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
