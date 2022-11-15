@@ -7,6 +7,7 @@ import java.util.Scanner;
 public class Client2 {
     public static String username; // the username of the user
     private static String password; // the password of the user
+    private static boolean registered = false; // check if the user registered
 
     public Client2(String serverIP, int port) throws IOException {
         System.out.printf("Connecting to %s:%d\n", serverIP, port);
@@ -27,40 +28,25 @@ public class Client2 {
                 // input the password
                 System.out.println("Input password:");
                 password = sc.nextLine();
-                // save the head as reg, it means the sending msg is a registration msg
+                // send the header as reg, it means the sending msg is a registration msg
                 String header = "reg";
-                // send the header to the server
-                int header_size = header.length();
-                out.writeInt(header_size);
-                out.write(header.getBytes(), 0, header_size);
-                // send the username to the server
-                int username_size = username.length();
-                out.writeInt(username_size);
-                out.write(username.getBytes(), 0, username_size);
-                // send the password to the server
-                int password_size = password.length();
-                out.writeInt(password_size);
-                out.write(password.getBytes(), 0, password_size);
+                sendString(header, out);
+                sendString(username, out);
+                sendString(password, out);
             }
             if (option == 2) { // Login
                 // TODO
                 // check the server if the account exist
                 // the server should have public hashmap which contain the username and password
                 while (true) { // sending msg
-                    // the sender should send out the receiver name to the server, and this let the server know who you want to send
+                    String header = "single";
+                    sendString(header, out);
                     System.out.println("Enter a receiver name:");
-                    String header = sc.nextLine();
-                    // send the header to the server
-                    int header_size = header.length();
-                    out.writeInt(header_size);
-                    out.write(header.getBytes(), 0, header_size);
-                    // input the msg
+                    String receiver = sc.nextLine();
+                    sendString(receiver, out);
                     System.out.println("Input message and press ENTER");
                     String message = sc.nextLine();
-                    // send the message to the server
-                    int size = message.length();
-                    out.writeInt(size);
-                    out.write(message.getBytes(), 0, size);
+                    sendString(message, out);
                 }
             }
             Thread t = new Thread(() -> {
@@ -77,10 +63,21 @@ public class Client2 {
                         System.out.println(receive);
                     }
                 } catch (Exception e) {
-                    System.out.println("Error msg in receiving: "+e.getMessage());
+                    e.printStackTrace();
                 }
             });
             t.start();
+        }
+    }
+
+    public void sendString(String str, DataOutputStream out) {
+        try {
+            // send the header to the server
+            int size = str.length();
+            out.writeInt(size);
+            out.write(str.getBytes(), 0, size);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -34,7 +34,7 @@ public class Server {
                 size -= len;
             }
             // registration process start
-            if (header.startsWith("reg")) {
+            if (header.equals("reg")) {
                 // get username
                 String username = "";
                 size = in.readInt();
@@ -91,13 +91,13 @@ public class Server {
         DataInputStream in = new DataInputStream(clientSocket.getInputStream());
         DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 
+        // extract data from offline file data
         Thread t = new Thread(() -> {
             try {
-                // extract data from offline file data
                 for (String username : socketList.keySet()) {
                     if (new File(username + ".txt").exists() && socketList.containsKey(username)) {
                         String offline_msg = get_offline_data(new File(username + ".txt"));
-                        forward(offline_msg, username);
+                        forward(offline_msg, username, "offline");
                         if (new File(username + ".txt").delete())
                             System.out.println("Deleted " + username + "'s offline data file");
                         else
@@ -120,9 +120,16 @@ public class Server {
 //            }
 //            out.writeInt(name_list.length());
 //            out.write(name_list.toString().getBytes(), 0, name_list.length());
+            String type = "";
+            int size = in.readInt();
+            while (size > 0) {
+                int len = in.read(buffer, 0, Math.min(size, buffer.length));
+                type += new String(buffer, 0, len);
+                size -= len;
+            }
             // receiving the msg target from the client
             String target = "";
-            int size = in.readInt();
+            size = in.readInt();
             while (size > 0) {
                 int len = in.read(buffer, 0, Math.min(size, buffer.length));
                 target += new String(buffer, 0, len);
@@ -147,21 +154,22 @@ public class Server {
             }
 
             if (socketList.containsKey(target))
-                forward(msg.toString(), target);
+                forward(msg.toString(), target, type);
             else {
                 // This is a debug msg, it will show when the receiver is offline
-                System.out.println(target + " msg will store to a file");
+                if(account.containsKey(target)) System.out.println(target + " msg will store to a file");
             }
         }
     }
 
-    private void forward(String msg, String target) {
+    private void forward(String msg, String target, String type) {
         synchronized (socketList) {
 
             try {
                 // the socket list will be the target socket == socketList.get(target)
                 DataOutputStream out = new DataOutputStream(socketList.get(target).getOutputStream());
                 // msg show in server side telling the msg detail in each time client forwarding msg
+                System.out.println("Type: " + type);
                 System.out.println("Target: " + target);
                 System.out.println("Msg: " + msg);
                 System.out.println("Socket: " + socketList.get(target));
@@ -193,6 +201,22 @@ public class Server {
             return res;
         } catch (Exception e) {
             System.out.println("Error in getting file data");
+        }
+        return res;
+    }
+
+    public String receiveString(DataInputStream in){
+        String res = "";
+        try{
+            byte[] buffer = new byte[1024];
+            int len = in.readInt();
+            while(len > 0){
+                int l = in.read(buffer,0,Math.min(len,buffer.length));
+                res+=new String(buffer,0,l);
+                len-=l;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return res;
     }
