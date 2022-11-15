@@ -76,6 +76,7 @@ public class Client {
             int size = str.length();
             out.writeInt(size);
             out.write(str.getBytes(), 0, size);
+            out.flush();
         } catch (Exception e) {
             e.printStackTrace();
         }
