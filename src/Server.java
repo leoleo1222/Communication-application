@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -120,24 +121,12 @@ public class Server {
 //            }
 //            out.writeInt(name_list.length());
 //            out.write(name_list.toString().getBytes(), 0, name_list.length());
-            String type = "";
-            int size = in.readInt();
-            while (size > 0) {
-                int len = in.read(buffer, 0, Math.min(size, buffer.length));
-                type += new String(buffer, 0, len);
-                size -= len;
-            }
+            String type = receiveString(in);
             // receiving the msg target from the client
-            String target = "";
-            size = in.readInt();
-            while (size > 0) {
-                int len = in.read(buffer, 0, Math.min(size, buffer.length));
-                target += new String(buffer, 0, len);
-                size -= len;
-            }
+            String target = receiveString(in);
             // receiving the msg from the client
             StringBuilder msg = new StringBuilder("");
-            size = in.readInt();
+            int size = in.readInt();
             while (size > 0) {
                 int len = in.read(buffer, 0, Math.min(size, buffer.length));
                 msg.append(new String(buffer, 0, len));
