@@ -52,15 +52,7 @@ public class Client2 {
             Thread t = new Thread(() -> {
                 try {
                     while (true) { // receiving msg
-                        String receive = "";
-                        int r_size = in.readInt();
-                        while (r_size > 0) {
-                            int len = in.read(buffer, 0, Math.min(r_size, buffer.length));
-                            receive += new String(buffer, 0, len);
-                            r_size -= len;
-                        }
-
-                        System.out.println(receive);
+                        System.out.println(receiveString(in));
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -79,6 +71,22 @@ public class Client2 {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String receiveString(DataInputStream in){
+        String res = "";
+        try{
+            byte[] buffer = new byte[1024];
+            int len = in.readInt();
+            while(len > 0){
+                int l = in.read(buffer,0,Math.min(len,buffer.length));
+                res+=new String(buffer,0,l);
+                len-=l;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return res;
     }
 
     public static void main(String[] args) {

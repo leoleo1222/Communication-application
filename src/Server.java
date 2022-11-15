@@ -53,7 +53,9 @@ public class Server {
                     size -= len;
                 }
                 // register the account
-                if(!account.containsKey(username)) account.put(username, password);
+                if(!account.containsKey(username)){
+                    account.put(username, password);
+                }
                 // put the username into the static var.
                 id = username;
                 // print out the log in username in server side for debug use
@@ -192,6 +194,17 @@ public class Server {
             System.out.println("Error in getting file data");
         }
         return res;
+    }
+
+    public void sendString(String str, DataOutputStream out) {
+        try {
+            // send the header to the server
+            int size = str.length();
+            out.writeInt(size);
+            out.write(str.getBytes(), 0, size);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String receiveString(DataInputStream in){
