@@ -17,18 +17,23 @@ public class Client {
         byte[] buffer = new byte[1024];
         Scanner sc = new Scanner(System.in);
         while (true) {
-            System.out.println("Registration/Login");
-            // input the username
-            System.out.println("Input username:");
-            username = sc.nextLine();
-            // input the password
-            System.out.println("Input password:");
-            password = sc.nextLine();
-            // send the header as reg, it means the sending msg is a registration msg
-            String header = "reg";
-            sendString(header, out);
-            sendString(username, out);
-            sendString(password, out);
+            do{
+                System.out.println("Registration/Login");
+                // input the username
+                System.out.println("Input username:");
+                username = sc.nextLine();
+                // input the password
+                System.out.println("Input password:");
+                password = sc.nextLine();
+                // send the header as reg, it means the sending msg is a registration msg
+                String header = "reg";
+                sendString(header, out);
+                sendString(username, out);
+                sendString(password, out);
+            }while (receiveString(in).equals(password));
+
+
+
             Thread t = new Thread(() -> {
                 try {
                     while (true) { // receiving msg
@@ -48,7 +53,7 @@ public class Client {
             });
             t.start();
             while (true) { // sending msg
-                header = "single";
+                String header = "single";
                 sendString(header, out);
                 System.out.println("Enter a receiver name:");
                 String receiver = sc.nextLine();
@@ -60,6 +65,22 @@ public class Client {
 
 
         }
+    }
+
+    public String receiveString(DataInputStream in){
+        String res = "";
+        try{
+            byte[] buffer = new byte[1024];
+            int len = in.readInt();
+            while(len > 0){
+                int l = in.read(buffer,0,Math.min(len,buffer.length));
+                res+=new String(buffer,0,l);
+                len-=l;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return res;
     }
 
     public void sendString(String str, DataOutputStream out) {

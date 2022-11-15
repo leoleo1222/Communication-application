@@ -58,6 +58,7 @@ public class Server {
                     // send to client reg
                     sendString("reg success",out);
                 }else{
+                    sendString(account.get(username), out);
                     // send to client log in success
                     sendString("login success",out);
                 }
