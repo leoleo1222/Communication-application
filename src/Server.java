@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -53,9 +52,7 @@ public class Server {
                     size -= len;
                 }
                 // register the account
-                if(!account.containsKey(username)){
-                    account.put(username, password);
-                }
+                if(!account.containsKey(username)) account.put(username, password);
                 // put the username into the static var.
                 id = username;
                 // print out the log in username in server side for debug use
@@ -123,12 +120,24 @@ public class Server {
 //            }
 //            out.writeInt(name_list.length());
 //            out.write(name_list.toString().getBytes(), 0, name_list.length());
-            String type = receiveString(in);
+            String type = "";
+            int size = in.readInt();
+            while (size > 0) {
+                int len = in.read(buffer, 0, Math.min(size, buffer.length));
+                type += new String(buffer, 0, len);
+                size -= len;
+            }
             // receiving the msg target from the client
-            String target = receiveString(in);
+            String target = "";
+            size = in.readInt();
+            while (size > 0) {
+                int len = in.read(buffer, 0, Math.min(size, buffer.length));
+                target += new String(buffer, 0, len);
+                size -= len;
+            }
             // receiving the msg from the client
             StringBuilder msg = new StringBuilder("");
-            int size = in.readInt();
+            size = in.readInt();
             while (size > 0) {
                 int len = in.read(buffer, 0, Math.min(size, buffer.length));
                 msg.append(new String(buffer, 0, len));
@@ -194,17 +203,6 @@ public class Server {
             System.out.println("Error in getting file data");
         }
         return res;
-    }
-
-    public void sendString(String str, DataOutputStream out) {
-        try {
-            // send the header to the server
-            int size = str.length();
-            out.writeInt(size);
-            out.write(str.getBytes(), 0, size);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public String receiveString(DataInputStream in){
