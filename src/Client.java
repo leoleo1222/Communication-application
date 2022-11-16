@@ -30,28 +30,26 @@ public class Client {
             sendString(username, out);
             sendString(password, out);
         } while (!receiveString(in).equals(password));
-        while (true) {
-            Thread t = new Thread(() -> {
-                try {
-                    while (true) { // receiving msg
-                        String receive = "";
-                        int r_size = in.readInt();
-                        while (r_size > 0) {
-                            int len = in.read(buffer, 0, Math.min(r_size, buffer.length));
-                            receive += new String(buffer, 0, len);
-                            r_size -= len;
-                        }
-
-                        System.out.println(receive);
+        Thread t = new Thread(() -> {
+            try {
+                while (true) { // receiving msg
+                    String receive = "";
+                    int r_size = in.readInt();
+                    while (r_size > 0) {
+                        int len = in.read(buffer, 0, Math.min(r_size, buffer.length));
+                        receive += new String(buffer, 0, len);
+                        r_size -= len;
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+
+                    System.out.println(receive);
                 }
-            });
-            t.start();
-            while (true) { // sending msg
-                directMsg(out, sc);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        });
+        t.start();
+        while (true) { // sending msg
+            directMsg(out, sc);
         }
     }
 
