@@ -7,7 +7,6 @@ import java.util.Scanner;
 public class Client {
     public static String username; // the username of the user
     private static String password; // the password of the user
-    private static boolean registered = false; // check if the user registered
 
     public Client(String serverIP, int port) throws IOException {
         System.out.printf("Connecting to %s:%d\n", serverIP, port);
