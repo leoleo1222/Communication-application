@@ -75,7 +75,6 @@ public class Server {
                 clientSocket.getInetAddress(), clientSocket.getPort());
 
         DataInputStream in = new DataInputStream(clientSocket.getInputStream());
-        DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
 
         // extract data from offline file data
         Thread t = new Thread(() -> {
@@ -99,11 +98,11 @@ public class Server {
         while (true) {
             // not necessary, just telling the client list to the client side
             // further development: client can ask for the client list with some command (input: showList)
-//            int i = 1;
-//            StringBuilder name_list = new StringBuilder();
-//            for (String username : socketList.keySet()) {
-//                name_list.append("[").append(i++).append("]").append(username).append("\n");
-//            }
+            int i = 1;
+            StringBuilder name_list = new StringBuilder();
+            for (String username : socketList.keySet()) {
+                name_list.append("[").append(i++).append("]").append(username).append("\n");
+            }
 //            out.writeInt(name_list.length());
 //            out.write(name_list.toString().getBytes(), 0, name_list.length());
             String type = "";
@@ -139,8 +138,10 @@ public class Server {
                 size -= len;
             }
 
-            if (socketList.containsKey(target))
+            if (socketList.containsKey(target)){
+//                forward(name_list.toString(), target, "System msg");
                 forward(msg.toString(), target, type);
+            }
             else {
                 // This is a debug msg, it will show when the receiver is offline
                 if (account.containsKey(target)) System.out.println(target + " msg will store to a file");
