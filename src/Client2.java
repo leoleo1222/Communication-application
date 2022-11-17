@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Client {
+public class Client2 {
     public static String username; // the username of the user
     private static String password; // the password of the user
 
-    public Client(String serverIP, int port) throws IOException {
+    public Client2(String serverIP, int port) throws IOException {
         System.out.printf("Connecting to %s:%d\n", serverIP, port);
         Socket socket = new Socket(serverIP, port);
         DataInputStream in = new DataInputStream(socket.getInputStream());
@@ -29,7 +29,6 @@ public class Client {
             sendString(username, out);
             sendString(password, out);
         } while (!receiveString(in).equals(password));
-
         Thread t = new Thread(() -> {
             try {
                 while (true) { // receiving msg
@@ -48,7 +47,6 @@ public class Client {
             }
         });
         t.start();
-
         while (true) { // sending msg
             directMsg(out, sc);
         }
