@@ -19,7 +19,9 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class gui extends Application {
+    //private static Client client;
     ObservableList<Node> children;
+    ObservableList<Node> listChildren;
     int msgIndex = 0;
 
     @FXML
@@ -58,12 +60,16 @@ public class gui extends Application {
 
         txtInput.setOnKeyPressed(event -> {
             if (event.getCode().toString().equals("ENTER"))
-                displayMessage();
+                sendMessage();
         });
 
-        /*upload.setOnMouseClicked(event -> {
+        swapMode.setOnMouseClicked(event -> {
+            swapMode();
+        });
+
+        upload.setOnMouseClicked(event -> {
             uploadFile();
-        });*/
+        });
     }
 
     private Node messageNode(String text, boolean alignToRight) {
@@ -78,16 +84,56 @@ public class gui extends Application {
         return box;
     }
 
-    private void displayMessage() {
+    private void sendMessage() {
         Platform.runLater(() -> {
             String text = txtInput.getText();
             txtInput.clear();
-            children.add(messageNode(text, msgIndex == 0));
-            msgIndex = (msgIndex + 1) % 2;
+            children.add(messageNode(text, true));
+            //msgIndex = (msgIndex + 1) % 2;
+            //client.sendString(text, client.out);
         });
     }
 
-    public static void main(String[] args){
-        launch(args);
+    private void swapMode() {
+        Platform.runLater(() -> {
+            // Clear list
+            listPane = new VBox();
+            listChildren = listPane.getChildren();
+
+            // Add list
+            if (swapMode.getText().equals("Group")) {
+                swapMode.setText("Individual");
+                for (int i = 0; ;i++);  //listChildren.add(ind[i]);
+
+            }
+            else {
+                swapMode.setText("Group");
+                for (int i = 0; ;i++);  //listChildren.add(grp[i]);
+
+            }
+        });
+    }
+
+    private void uploadFile() {
+        Platform.runLater(() -> {
+            
+        });
+    }
+
+    public static void main(String[] args) throws IOException {
+        String serverIP = "127.0.0.1";
+        int port = 12345;
+
+
+        Thread t1 = new Thread(()-> {
+            launch(args);
+        });
+        t1.start();
+
+        /*try {
+            client = new Client(serverIP, port);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
     }
 }

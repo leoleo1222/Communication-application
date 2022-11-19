@@ -14,7 +14,11 @@
          <content>
             <VBox fx:id="listPane" prefHeight="400.0" prefWidth="200.0">
                <children>
+<<<<<<< Updated upstream
                   <Button fx:id="swapMode" mnemonicParsing="false" prefHeight="30.0" prefWidth="200.0" text="Group" />
+=======
+                  <Button fx:id="swapMode" mnemonicParsing="false" prefHeight="30.0" prefWidth="200.0" text="Individual" />
+>>>>>>> Stashed changes
                </children>
             </VBox>
          </content>
