@@ -88,23 +88,26 @@ public class Client2 {
                         sendString(member, out);
                         if (member.equals("!end")) break;
                     }
-                } else if (groupChoice == 2) { // join a group
+                }
+                if (groupChoice == 2) { // join a group
                     System.out.println("Enter a group name:");
                     String groupName = sc.nextLine();
                     sendString(groupName, out); // send the group name to the server
                     sendString(username, out); // send the username to the server
-                } else if (groupChoice == 3) { // leave a group
+                }
+                if (groupChoice == 3) { // leave a group
                     System.out.println("Enter a group name:");
                     String groupName = sc.nextLine();
                     sendString(groupName, out); // send the group name to the server
                     sendString(username, out); // send the username to the server
-                } else if (groupChoice == 4) { // send a message to a group
+                }
+                if (groupChoice == 4) { // send a message to a group
                     System.out.println("Enter a group name:");
                     String groupName = sc.nextLine();
                     sendString(groupName, out); // send the group name to the server
                     System.out.println("Input message and press ENTER");
                     String message = username+": ";
-                    message += sc.nextLine(); 
+                    message += sc.nextLine();
                     sendString(message, out); // send the message to the server
                 }
             }
