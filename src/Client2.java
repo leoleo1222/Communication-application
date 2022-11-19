@@ -53,8 +53,8 @@ public class Client2 {
             int choice = sc.nextInt();
             sc.nextLine();
             if (choice == 1) {
+                sendString(header[1] , out);
                 while (true){
-                    sendString(header[1] , out);
                     System.out.println("Enter a receiver name:");
                     String receiver = sc.nextLine();
                     if (receiver.equals("@@quit")) break;
