@@ -60,7 +60,8 @@ public class Client {
                     if (receiver.equals("@@quit")) break;
                     sendString(receiver, out);
                     System.out.println("Input message and press ENTER");
-                    String message = sc.nextLine();
+                    String message = username+": ";
+                    message += sc.nextLine();
                     if (message.equals("@@quit")) break;
                     sendString(message, out);
                 }
