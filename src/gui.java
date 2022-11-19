@@ -49,7 +49,7 @@ public class gui extends Application {
         loader.setController(this);
         Parent root = loader.load();
 
-        Scene scene = new Scene(root, 500, 300);
+        Scene scene = new Scene(root, 1000, 650);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Chat");
         primaryStage.setResizable(false);
@@ -122,12 +122,12 @@ public class gui extends Application {
             // Add list
             if (swapMode.getText().equals("Group")) {
                 swapMode.setText("Individual");
-                for (int i = 0; ;i++);  //listChildren.add(ind[i]);
+                //for (int i = 0; ;i++);  //listChildren.add(ind[i]);
 
             }
             else {
                 swapMode.setText("Group");
-                for (int i = 0; ;i++);  //listChildren.add(grp[i]);
+                //for (int i = 0; ;i++);  //listChildren.add(grp[i]);
 
             }
         });
