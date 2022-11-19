@@ -50,6 +50,7 @@ public class gui extends Application {
 
     @FXML
     protected void initialize() {
+        new PopupWindow();
         children = messagePane.getChildren();
 
         messagePane.heightProperty().addListener(event -> {
