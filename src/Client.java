@@ -5,8 +5,8 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
-    public static String username; // the username of the user
-    private static String password; // the password of the user
+    public static String username = " "; // the username of the user
+    private static String password = " "; // the password of the user
 
     public Client(String serverIP, int port) throws IOException {
         System.out.printf("Connecting to %s:%d\n", serverIP, port);
@@ -49,17 +49,30 @@ public class Client {
         t.start();
         while (true) { // sending msg
             sendString(header[1] , out);
-            directMsg(out, sc);
+            System.out.print("Type 1 to send a direct message, 2 to send a group message, ");
+            System.out.println("Type @@quit to quit the session");
+            int choice = sc.nextInt();
+            sc.nextLine();
+            if (choice == 1) {
+                while (true){
+                    System.out.println("Enter a receiver name:");
+                    String receiver = sc.nextLine();
+                    if (receiver.equals("@@quit")) break;
+                    sendString(receiver, out);
+                    System.out.println("Input message and press ENTER");
+                    String message = sc.nextLine();
+                    if (message.equals("@@quit")) break;
+                    sendString(message, out);
+                }
+            } else if (choice == 2) {
+                System.out.println("In group message mode");
+//                groupMsg(out, sc);
+            }
         }
     }
 
-    private void directMsg(DataOutputStream out, Scanner sc) {
-        System.out.println("Enter a receiver name:");
-        String receiver = sc.nextLine();
-        sendString(receiver, out);
-        System.out.println("Input message and press ENTER");
-        String message = sc.nextLine();
-        sendString(message, out);
+    private void groupMsg(DataOutputStream out, Scanner sc) {
+
     }
 
     public String receiveString(DataInputStream in) {

@@ -9,7 +9,6 @@ public class Server {
     HashMap<String, Socket> socketList = new HashMap<>();
     // this store their account information, we can check if the account exist with containsKey(..)
     HashMap<String, String> account = new HashMap<>();
-    // id = username, in case i want to user it through method, i put it in a static var.
     private static String id = "";
 
     public void print(String str, Object... o) {
@@ -55,7 +54,7 @@ public class Server {
                     // start passing msg with the server
                     serve(clientSocket);
                 } catch (IOException ex) {
-                    System.out.println("Connection drop!");
+                    System.out.println("Connection drop!\n");
                 }
 
                 synchronized (socketList) {
@@ -152,7 +151,7 @@ public class Server {
                 System.out.println("Type: " + type);
                 System.out.println("Target: " + target);
                 System.out.println("Msg: " + msg);
-                System.out.println("Socket: " + socketList.get(target));
+                System.out.println("Socket: " + socketList.get(target)+"\n");
                 // send the msg
                 out.writeInt(msg.length());
                 out.write(msg.getBytes(), 0, msg.length());
