@@ -1,20 +1,16 @@
-import javafx.application.Application;
-import javafx.stage.Stage;
 
-public class main extends Application {
-    PopupWindow log = new PopupWindow();
-    gui chat = new gui();
+public class main {
     public static void main(String[] args) {
         new main().runApp(args);
     }
 
     public void runApp(String[] args) {
-        log.launch(args);
-        chat.launch(args);
-    }
-
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-
+        new Thread() {
+            @Override
+            public void run() {
+                javafx.application.Application.launch(PopupWindow.class);
+            }
+        }.start();
+        // PopupWindow startUpTest = PopupWindow.waitForStartUpTest();
     }
 }

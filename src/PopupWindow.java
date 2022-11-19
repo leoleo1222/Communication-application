@@ -91,5 +91,4 @@ public class PopupWindow extends Application{
     public static void main(String[] args){
         launch(args);
     }
-
 }
