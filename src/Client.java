@@ -48,12 +48,12 @@ public class Client {
         });
         t.start();
         while (true) { // sending msg
-            sendString(header[1] , out);
             System.out.print("Type 1 to send a direct message, 2 to send a group message, ");
             System.out.println("Type @@quit to quit the session");
             int choice = sc.nextInt();
             sc.nextLine();
             if (choice == 1) {
+                sendString(header[1] , out);
                 while (true){
                     System.out.println("Enter a receiver name:");
                     String receiver = sc.nextLine();
