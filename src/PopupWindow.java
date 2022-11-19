@@ -7,13 +7,19 @@
 */
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.DataInputStream;
@@ -22,15 +28,35 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class PopupWindow extends Application{
+    // for login
     @FXML private TextField txtUsername;
     @FXML private PasswordField txtPassword;
 
     /// ComboBox requires the data type of its child items
     @FXML private Button LogInAndRegister;
+    @FXML private ComboBox<String> cbxFlag;
+    @FXML private CheckBox chkAgreement;
+    @FXML private RadioButton rdoDay, rdoNight;
+    @FXML private Button btnLogin, btnCancel;
 
     Stage stage;
 
-    public String username, password;
+    public String username, password, flag;
+    public boolean loggedIn = false;
+
+    public PopupWindow() throws IOException {
+        stage = new Stage();
+        FXMLLoader loader =
+                new FXMLLoader(getClass().getResource("PopupWindow.fxml"));
+        loader.setController(this);
+        Parent root = loader.load();
+        Scene scene = new Scene(root, 300, 280);
+        stage.setScene(scene);
+        stage.setTitle("Pop Up");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
+        stage.showAndWait();
+    }
 
     public void start(Stage primaryStage) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("PopupWindow.fxml"));
@@ -57,6 +83,8 @@ public class PopupWindow extends Application{
                 sendString(username, out);
                 sendString(password, out);
             } while (!receiveString(in).equals(password));
+            loggedIn = true;
+            stage.close();
         });
     }
 
@@ -86,9 +114,5 @@ public class PopupWindow extends Application{
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static void main(String[] args){
-        launch(args);
     }
 }

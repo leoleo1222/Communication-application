@@ -39,20 +39,25 @@ public class gui extends Application {
     @FXML
     private VBox listPane;
 
+    public static void print(String str, Object... o) {
+        System.out.printf(str, o);
+    }
+
+
     public void start(Stage primaryStage) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("gui.fxml"));
         loader.setController(this);
         Parent root = loader.load();
-        primaryStage.setScene(new Scene(root));
+
+        Scene scene = new Scene(root, 500, 300);
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Chat");
-        primaryStage.setMinWidth(300);
-        primaryStage.setMinHeight(500);
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
     @FXML
     protected void initialize() {
-        new PopupWindow();
         children = messagePane.getChildren();
 
         messagePane.heightProperty().addListener(event -> {
@@ -71,6 +76,19 @@ public class gui extends Application {
         upload.setOnMouseClicked(event -> {
             uploadFile();
         });
+
+        try {
+            PopupWindow pop = new PopupWindow();
+            if (pop.loggedIn)
+                print("username: %s\npassword: %s\nflag:%s\n",
+                        pop.username,
+                        pop.password,
+                        pop.flag);
+            else
+                System.out.print("Cancelled\n");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private Node messageNode(String text, boolean alignToRight) {
@@ -122,19 +140,6 @@ public class gui extends Application {
     }
 
     public static void main(String[] args) throws IOException {
-        String serverIP = "127.0.0.1";
-        int port = 12345;
-
-
-        Thread t1 = new Thread(()-> {
-            launch(args);
-        });
-        t1.start();
-
-        /*try {
-            client = new Client(serverIP, port);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+        launch(args);
     }
 }
