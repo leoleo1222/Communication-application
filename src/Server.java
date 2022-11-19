@@ -9,6 +9,8 @@ public class Server {
     HashMap<String, Socket> socketList = new HashMap<>();
     // this store their account information, we can check if the account exist with containsKey(..)
     HashMap<String, String> account = new HashMap<>();
+    HashMap<String, ArrayList<String>> group = new HashMap<>();
+
     private static String id = "";
 
     public void print(String str, Object... o) {
@@ -136,6 +138,53 @@ public class Server {
                     // This is a debug msg, it will show when the receiver is offline
                     if (account.containsKey(target)) System.out.println(target + " msg will store to a file");
                 }
+            }
+            if(type.equals("group")){
+                String action = receiveString(in);
+                if(action.equals("create")){ // create a group
+                    String group_name = receiveString(in);
+                    group.put(group_name, new ArrayList<>());
+                    String member = receiveString(in);
+                    while(!member.equals("end")){
+                        group.get(group_name).add(member);
+                        member = receiveString(in);
+                    }
+                    forward("Group " + group_name + " created", id, "System msg");
+                }
+                if(action.equals("join")){  // join a group
+                    String group_name = receiveString(in);
+                    if(group.containsKey(group_name)){
+                        group.get(group_name).add(id);
+                        forward("You joined group " + group_name, id, "System msg");
+                    }
+                    else{
+                        forward("Group " + group_name + " does not exist", id, "System msg");
+                    }
+                }
+                if(action.equals("leave")){ // leave a group
+                    String group_name = receiveString(in);
+                    if(group.containsKey(group_name)){
+                        group.get(group_name).remove(id);
+                        forward("You left group " + group_name, id, "System msg");
+                    }
+                    else{
+                        forward("Group " + group_name + " does not exist", id, "System msg");
+                    }
+                }
+                if(action.equals("send")){  // send msg to a group
+                    String group_name = receiveString(in);
+                    if(group.containsKey(group_name)){
+                        String msg = receiveString(in);
+                        for(String member : group.get(group_name)){
+                            forward(msg, member, "group");
+                        }
+                    }
+                    else{
+                        forward("Group " + group_name + " does not exist", id, "System msg");
+                    }
+                }
+                
+
             }
 
         }
