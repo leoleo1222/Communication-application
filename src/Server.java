@@ -105,47 +105,40 @@ public class Server {
             }
 //            out.writeInt(name_list.length());
 //            out.write(name_list.toString().getBytes(), 0, name_list.length());
-            String type = "";
-            int size = in.readInt();
-            while (size > 0) {
-                int len = in.read(buffer, 0, Math.min(size, buffer.length));
-                type += new String(buffer, 0, len);
-                size -= len;
-            }
-            // receiving the msg target from the client
-            String target = "";
-            size = in.readInt();
-            while (size > 0) {
-                int len = in.read(buffer, 0, Math.min(size, buffer.length));
-                target += new String(buffer, 0, len);
-                size -= len;
-            }
-            // receiving the msg from the client
-            StringBuilder msg = new StringBuilder("");
-            size = in.readInt();
-            while (size > 0) {
-                int len = in.read(buffer, 0, Math.min(size, buffer.length));
-                msg.append(new String(buffer, 0, len));
-                if (!socketList.containsKey(target) && account.containsKey(target)) {
-                    File file = new File(target + ".txt");
-                    FileOutputStream out_file = new FileOutputStream(file, true);
-                    System.out.println("Saved into " + target);
-                    out_file.write(buffer, 0, len);
-                    out_file.write('\n');
-                    out_file.flush();
-                    out_file.close();
+            // receive the msg type from client
+            String type = receiveString(in);
+            // if the msg type is "single", then it is a normal msg from client to client
+            if(type.equals("single")){
+                // receiving the msg target from the client
+                String target = receiveString(in);
+                // receiving the msg from the client
+                StringBuilder msg = new StringBuilder("");
+                int size = in.readInt();
+                while (size > 0) {
+                    int len = in.read(buffer, 0, Math.min(size, buffer.length));
+                    msg.append(new String(buffer, 0, len));
+                    if (!socketList.containsKey(target) && account.containsKey(target)) {
+                        File file = new File(target + ".txt");
+                        FileOutputStream out_file = new FileOutputStream(file, true);
+                        System.out.println("Saved into " + target);
+                        out_file.write(buffer, 0, len);
+                        out_file.write('\n');
+                        out_file.flush();
+                        out_file.close();
+                    }
+                    size -= len;
                 }
-                size -= len;
+
+                if (socketList.containsKey(target)){
+//                forward(name_list.toString(), target, "System msg");
+                    forward(msg.toString(), target, type);
+                }
+                else {
+                    // This is a debug msg, it will show when the receiver is offline
+                    if (account.containsKey(target)) System.out.println(target + " msg will store to a file");
+                }
             }
 
-            if (socketList.containsKey(target)){
-//                forward(name_list.toString(), target, "System msg");
-                forward(msg.toString(), target, type);
-            }
-            else {
-                // This is a debug msg, it will show when the receiver is offline
-                if (account.containsKey(target)) System.out.println(target + " msg will store to a file");
-            }
         }
     }
 

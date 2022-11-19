@@ -14,6 +14,7 @@ public class Client {
         DataInputStream in = new DataInputStream(socket.getInputStream());
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         byte[] buffer = new byte[1024];
+        String[] header = {"reg", "single", "group"};
         Scanner sc = new Scanner(System.in);
         do {
             System.out.println("Registration/Login");
@@ -24,8 +25,7 @@ public class Client {
             System.out.println("Input password:");
             password = sc.nextLine();
             // send the header as reg, it means the sending msg is a registration msg
-            String header = "reg";
-            sendString(header, out);
+            sendString(header[0], out);
             sendString(username, out);
             sendString(password, out);
         } while (!receiveString(in).equals(password));
@@ -48,13 +48,12 @@ public class Client {
         });
         t.start();
         while (true) { // sending msg
+            sendString(header[1] , out);
             directMsg(out, sc);
         }
     }
 
     private void directMsg(DataOutputStream out, Scanner sc) {
-        String header = "single";
-        sendString(header, out);
         System.out.println("Enter a receiver name:");
         String receiver = sc.nextLine();
         sendString(receiver, out);
