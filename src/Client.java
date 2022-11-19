@@ -66,14 +66,45 @@ public class Client {
                     sendString(message, out);
                 }
             } else if (choice == 2) {
-                System.out.println("In group message mode");
-//                groupMsg(out, sc);
+                // create a group with member, the client will send out the member list to the server
+                // and the server will create a group with the member list
+                sendString(header[2], out);
+                // user can perform four operation: create/ join/ leave/ send with typing 1-4
+                System.out.println("Type 1 to create a group, 2 to join a group, 3 to leave a group, 4 to send a message");
+                int groupChoice = sc.nextInt();
+                sc.nextLine();
+                if (groupChoice == 1) { // create a group
+                    System.out.println("Enter the group name:");
+                    String groupName = sc.nextLine();
+                    sendString(groupName, out);
+                    // user can keep adding member to the group until the user type !end
+                    while (true) {
+                        System.out.println("Enter a member name:");
+                        String member = sc.nextLine();
+                        sendString(member, out);
+                        if (member.equals("!end")) break;
+                    }
+                } else if (groupChoice == 2) { // join a group
+                    System.out.println("Enter a group name:");
+                    String groupName = sc.nextLine();
+                    sendString(groupName, out); // send the group name to the server
+                    sendString(username, out); // send the username to the server
+                } else if (groupChoice == 3) { // leave a group
+                    System.out.println("Enter a group name:");
+                    String groupName = sc.nextLine();
+                    sendString(groupName, out); // send the group name to the server
+                    sendString(username, out); // send the username to the server
+                } else if (groupChoice == 4) { // send a message to a group
+                    System.out.println("Enter a group name:");
+                    String groupName = sc.nextLine();
+                    sendString(groupName, out); // send the group name to the server
+                    System.out.println("Input message and press ENTER");
+                    String message = username+": ";
+                    message += sc.nextLine(); 
+                    sendString(message, out); // send the message to the server
+                }
             }
         }
-    }
-
-    private void groupMsg(DataOutputStream out, Scanner sc) {
-
     }
 
     public String receiveString(DataInputStream in) {

@@ -145,7 +145,7 @@ public class Server {
                     String group_name = receiveString(in);
                     group.put(group_name, new ArrayList<>());
                     String member = receiveString(in);
-                    while(!member.equals("end")){
+                    while(!member.equals("!end")){
                         group.get(group_name).add(member);
                         member = receiveString(in);
                     }
