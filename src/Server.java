@@ -146,7 +146,12 @@ public class Server {
                     group.put(group_name, new ArrayList<>());
                     String member = receiveString(in);
                     while(!member.equals("!end")){
-                        group.get(group_name).add(member);
+                        // check if the member exist
+                        if(account.containsKey(member)){
+                            group.get(group_name).add(member);
+                        }else{
+                            System.out.println(member + " is not exist");
+                        }
                         member = receiveString(in);
                     }
                     // print the member list in the created group
