@@ -142,7 +142,6 @@ public class Server {
             if(type.equals("group")){
                 String action = receiveString(in);
                 if(action.equals("create")){ // create a group
-                    String creater = receiveString(in);
                     String group_name = receiveString(in);
                     group.put(group_name, new ArrayList<>());
                     String member = receiveString(in);
@@ -150,26 +149,30 @@ public class Server {
                         group.get(group_name).add(member);
                         member = receiveString(in);
                     }
-                    forward("Group " + group_name + " created", creater, "System msg");
+                    // print the member list in the created group
+                    System.out.println("Group " + group_name + " is created with members:");
+                    for(String member_name : group.get(group_name)){
+                        System.out.println(member_name);
+                    }
                 }
                 if(action.equals("join")){  // join a group
                     String group_name = receiveString(in);
                     if(group.containsKey(group_name)){
                         group.get(group_name).add(id);
-                        forward("You joined group " + group_name, id, "System msg");
+                        // forward("You joined group " + group_name, id, "System msg");
                     }
                     else{
-                        forward("Group " + group_name + " does not exist", id, "System msg");
+                        // forward("Group " + group_name + " does not exist", id, "System msg");
                     }
                 }
                 if(action.equals("leave")){ // leave a group
                     String group_name = receiveString(in);
                     if(group.containsKey(group_name)){
                         group.get(group_name).remove(id);
-                        forward("You left group " + group_name, id, "System msg");
+                        // forward("You left group " + group_name, id, "System msg");
                     }
                     else{
-                        forward("Group " + group_name + " does not exist", id, "System msg");
+                        // forward("Group " + group_name + " does not exist", id, "System msg");
                     }
                 }
                 if(action.equals("send")){  // send msg to a group
@@ -177,11 +180,11 @@ public class Server {
                     if(group.containsKey(group_name)){
                         String msg = receiveString(in);
                         for(String member : group.get(group_name)){
-                            forward(msg, member, "group");
+                             forward(msg, member, "group");
                         }
                     }
                     else{
-                        forward("Group " + group_name + " does not exist", id, "System msg");
+                        // forward("Group " + group_name + " does not exist", id, "System msg");
                     }
                 }
                 

@@ -79,7 +79,6 @@ public class Client3 {
                 sendString(groupOperation[groupChoice-1], out);
                 if (groupChoice == 1) { // create a group
                     // send out the creator name
-                    sendString(username, out);
                     System.out.println("Enter the group name:");
                     String groupName = sc.nextLine();
                     sendString(groupName, out);
