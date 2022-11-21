@@ -57,6 +57,7 @@ public class Server {
             }
 
             Thread t = new Thread(() -> {
+                String name = id;
                 try {
                     // start passing msg with the server
                     serve(id, clientSocket);
@@ -66,9 +67,9 @@ public class Server {
 
                 synchronized (socketList) {
                     // print out the logout username in server side for debug use
-                    System.out.println(id + " is offline");
+                    System.out.println(name + " is offline");
                     // let the user offline
-                    socketList.remove(id);
+                    socketList.remove(name);
                 }
             });
             t.start();
