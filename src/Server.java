@@ -23,7 +23,7 @@ public class Server {
         while (true) {
             print("Listening at port %d...\n", port);
             Socket clientSocket = srvSocket.accept();
-            try{
+            try {
                 // reading the header
                 DataInputStream in = new DataInputStream(clientSocket.getInputStream());
                 String header = receiveString(in);
@@ -46,7 +46,7 @@ public class Server {
                     // print out the login username in server side for debug use
                     System.out.println(id + " logged in");
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 continue;
             }
 
@@ -59,7 +59,7 @@ public class Server {
             Thread t = new Thread(() -> {
                 try {
                     // start passing msg with the server
-                    serve(clientSocket);
+                    serve(id, clientSocket);
                 } catch (IOException ex) {
                     System.out.println("Connection drop!\n");
                 }
@@ -75,7 +75,7 @@ public class Server {
         }
     }
 
-    private void serve(Socket clientSocket) throws IOException {
+    private void serve(String name, Socket clientSocket) throws IOException {
         byte[] buffer = new byte[1024];
         print("Established a connection to host %s:%d\n\n",
                 clientSocket.getInetAddress(), clientSocket.getPort());
@@ -114,7 +114,7 @@ public class Server {
             // receive the msg type from client
             String type = receiveString(in);
             // if the msg type is "single", then it is a normal msg from client to client
-            if(type.equals("single")){
+            if (type.equals("single")) {
                 // receiving the msg target from the client
                 String target = receiveString(in);
                 // receiving the msg from the client
@@ -135,77 +135,73 @@ public class Server {
                     size -= len;
                 }
 
-                if (socketList.containsKey(target)){
+                if (socketList.containsKey(target)) {
 //                forward(name_list.toString(), target, "System msg");
                     forward(msg.toString(), target, type);
-                }
-                else {
+                } else {
                     // This is a debug msg, it will show when the receiver is offline
                     if (account.containsKey(target)) System.out.println(target + " msg will store to a file");
                 }
             }
-            if(type.equals("group")){
+            if (type.equals("group")) {
                 String action = receiveString(in);
-                if(action.equals("create")){ // create a group
+                if (action.equals("create")) { // create a group
                     String group_name = receiveString(in);
                     group.put(group_name, new ArrayList<>());
                     String member = receiveString(in);
-                    while(!member.equals("!end")){
+                    while (!member.equals("!end")) {
                         // check if the member exist
-                        if(account.containsKey(member)){
+                        if (account.containsKey(member)) {
                             group.get(group_name).add(member);
-                        }else{
+                        } else {
                             System.out.println(member + " is not exist");
                         }
                         member = receiveString(in);
                     }
                     // print the member list in the created group
                     System.out.println("Group " + group_name + " is created with members:");
-                    for(String member_name : group.get(group_name)){
+                    for (String member_name : group.get(group_name)) {
                         System.out.println(member_name);
                     }
                     // send a msg to the creator to tell him/her the group is created
-                    sendString("System: " + "Group " + group_name + " is created", out);
+                    sendString("System: " + "Group " + group_name + " is created by " + name, out);
                 }
-                if(action.equals("join")){  // join a group
+                if (action.equals("join")) {  // join a group
                     String group_name = receiveString(in);
-                    if(group.containsKey(group_name)){
+                    if (group.containsKey(group_name)) {
                         group.get(group_name).add(id);
                         sendString("System: " + "You joined group " + group_name, out);
 
-                    }
-                    else{
+                    } else {
                         sendString("System: " + "Group " + group_name + " does not exist", out);
                     }
                 }
-                if(action.equals("leave")){ // leave a group
+                if (action.equals("leave")) { // leave a group
                     String group_name = receiveString(in);
-                    if(group.containsKey(group_name)){
+                    if (group.containsKey(group_name)) {
                         group.get(group_name).remove(id);
                         sendString("System: " + "You left group " + group_name, out);
 
-                    }
-                    else{
+                    } else {
                         sendString("System: " + "Group " + group_name + " does not exist", out);
 
                     }
                 }
-                if(action.equals("send")){  // send msg to a group
+                if (action.equals("send")) {  // send msg to a group
                     String group_name = receiveString(in);
-                    if(group.containsKey(group_name)){
+                    if (group.containsKey(group_name)) {
                         String msg = receiveString(in);
-                        for(String member : group.get(group_name)){
-                             forward(msg, member, "group");
+                        for (String member : group.get(group_name)) {
+                            forward(msg, member, "group");
                         }
-                    }
-                    else{
+                    } else {
                         sendString("System: " + "Group " + group_name + " does not exist", out);
                     }
                 }
-                
+
 
             }
-            if(type.equals("showList")){    // show the client list
+            if (type.equals("showList")) {    // show the client list
                 sendString("System: " + name_list.toString(), out);
             }
 
@@ -222,7 +218,7 @@ public class Server {
                 System.out.println("Type: " + type);
                 System.out.println("Target: " + target);
                 System.out.println("Msg: " + msg);
-                System.out.println("Socket: " + socketList.get(target)+"\n");
+                System.out.println("Socket: " + socketList.get(target) + "\n");
                 // send the msg
                 out.writeInt(msg.length());
                 out.write(msg.getBytes(), 0, msg.length());
@@ -270,13 +266,13 @@ public class Server {
     public String receiveString(DataInputStream in) throws IOException {
         String res = "";
 //        try {
-            byte[] buffer = new byte[1024];
-            int len = in.readInt();
-            while (len > 0) {
-                int l = in.read(buffer, 0, Math.min(len, buffer.length));
-                res += new String(buffer, 0, l);
-                len -= l;
-            }
+        byte[] buffer = new byte[1024];
+        int len = in.readInt();
+        while (len > 0) {
+            int l = in.read(buffer, 0, Math.min(len, buffer.length));
+            res += new String(buffer, 0, l);
+            len -= l;
+        }
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }

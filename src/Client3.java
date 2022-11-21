@@ -84,7 +84,7 @@ public class Client3 {
                     sendString(groupName, out);
                     // user can keep adding member to the group until the user type !end
                     while (true) {
-                        System.out.println("Enter a member name:");
+                        System.out.println("Enter a member name: (Enter !end to end)");
                         String member = sc.nextLine();
                         sendString(member, out);
                         if (member.equals("!end")) break;
