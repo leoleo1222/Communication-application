@@ -14,7 +14,7 @@ public class Client2 {
         DataInputStream in = new DataInputStream(socket.getInputStream());
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         byte[] buffer = new byte[1024];
-        String[] header = {"reg", "single", "group"};
+        String[] header = {"reg", "single", "group", "showList", "exit"};
         Scanner sc = new Scanner(System.in);
         do {
             System.out.println("Registration/Login");
@@ -48,7 +48,7 @@ public class Client2 {
         });
         t.start();
         while (true) { // sending msg
-            System.out.print("Type 1 to send a direct message, 2 to send a group message, ");
+            System.out.print("Type 1 to send a direct message, 2 to send a group message, 3 to check user list, 4 to exit");
             System.out.println("Type @@quit to quit the session");
             int choice = sc.nextInt();
             sc.nextLine();
@@ -78,7 +78,7 @@ public class Client2 {
                 // send the group operation to the server
                 sendString(groupOperation[groupChoice-1], out);
                 if (groupChoice == 1) { // create a group
-                    // send out the creator name
+                    // send out the creator name direct message, 2 to send a group messa
                     System.out.println("Enter the group name:");
                     String groupName = sc.nextLine();
                     sendString(groupName, out);
@@ -111,6 +111,11 @@ public class Client2 {
                     message += sc.nextLine();
                     sendString(message, out); // send the message to the server
                 }
+            }else if (choice == 3) {
+                sendString(header[3], out);
+            }
+            else if (choice == 4) {
+                System.exit(0);
             }
         }
     }
@@ -144,10 +149,11 @@ public class Client2 {
     }
 
     public static void main(String[] args) {
+
         String serverIP = "127.0.0.1";
         int port = 12345;
         try {
-            new Client(serverIP, port);
+            new Client2(serverIP, port);
         } catch (Exception e) {
             e.printStackTrace();
         }

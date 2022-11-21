@@ -78,7 +78,7 @@ public class Client3 {
                 // send the group operation to the server
                 sendString(groupOperation[groupChoice-1], out);
                 if (groupChoice == 1) { // create a group
-                    // send out the creator name
+                    // send out the creator name direct message, 2 to send a group messa
                     System.out.println("Enter the group name:");
                     String groupName = sc.nextLine();
                     sendString(groupName, out);
@@ -152,7 +152,7 @@ public class Client3 {
         String serverIP = "127.0.0.1";
         int port = 12345;
         try {
-            new Client(serverIP, port);
+            new Client3(serverIP, port);
         } catch (Exception e) {
             e.printStackTrace();
         }
