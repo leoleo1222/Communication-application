@@ -21,7 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class gui extends Application {
+public class gui2 extends Application {
     //private static Client client;
     ObservableList<Node> children;
     ObservableList<Node> listChildren;
@@ -30,7 +30,7 @@ public class gui extends Application {
     String[] header = {"reg", "single", "group", "showList", "exit"};
     private ArrayList<String> dmList;
     private String[][] groupList = new String[0][0];
-    private String receiver = "sam";
+    private String receiver = "jason";
 
 
     @FXML
@@ -65,7 +65,7 @@ public class gui extends Application {
 
         Scene scene = new Scene(root, 1000, 650);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Chat");
+        primaryStage.setTitle("Chat2");
         primaryStage.setResizable(false);
         primaryStage.show();
 
@@ -193,7 +193,7 @@ public class gui extends Application {
 
     private void uploadFile() {
         Platform.runLater(() -> {
-            
+
         });
     }
 
@@ -229,3 +229,4 @@ public class gui extends Application {
         launch(args);
     }
 }
+

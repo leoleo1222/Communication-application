@@ -44,6 +44,9 @@ public class PopupWindow extends Application{
     public String username, password, flag;
     public boolean loggedIn = false;
 
+    public DataOutputStream out;
+    public DataInputStream in;
+
     public PopupWindow() throws IOException {
         stage = new Stage();
         FXMLLoader loader =
@@ -73,8 +76,8 @@ public class PopupWindow extends Application{
     protected void initialize() throws IOException{
         Socket socket = new Socket("127.0.0.1", 12345);
 
-        DataInputStream in = new DataInputStream(socket.getInputStream());
-        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+        in = new DataInputStream(socket.getInputStream());
+        out = new DataOutputStream(socket.getOutputStream());
         LogInAndRegister.setOnMouseClicked(event -> {
         username = txtUsername.getText();
         password = txtPassword.getText();
