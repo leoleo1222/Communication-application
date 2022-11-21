@@ -6,10 +6,10 @@ import java.util.HashMap;
 
 public class Server {
     // this store the online user with their socket
-    HashMap<String, Socket> socketList = new HashMap<>();
+    public static HashMap<String, Socket> socketList = new HashMap<>();
     // this store their account information, we can check if the account exist with containsKey(..)
-    HashMap<String, String> account = new HashMap<>();
-    HashMap<String, ArrayList<String>> group = new HashMap<>();
+    public static HashMap<String, String> account = new HashMap<>();
+    public static HashMap<String, ArrayList<String>> group = new HashMap<>();
 
     private static String id = "";
 
@@ -19,6 +19,10 @@ public class Server {
 
     public Server(int port) throws IOException {
         ServerSocket srvSocket = new ServerSocket(port);
+        //create 3 accounts at the beginning for testing
+        account.put("leo","leo");
+        account.put("jason","jason");
+        account.put("sam","sam");
 
         while (true) {
             print("Listening at port %d...\n", port);

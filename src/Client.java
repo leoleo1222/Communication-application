@@ -5,8 +5,8 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
-    public static String username; // the username of the user
-    private static String password; // the password of the user
+    public static String username = " "; // the username of the user
+    private static String password = " "; // the password of the user
 
     public Client(String serverIP, int port) throws IOException {
         System.out.printf("Connecting to %s:%d\n", serverIP, port);
@@ -14,6 +14,7 @@ public class Client {
         DataInputStream in = new DataInputStream(socket.getInputStream());
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         byte[] buffer = new byte[1024];
+        String[] header = {"reg", "single", "group", "showList", "exit"};
         Scanner sc = new Scanner(System.in);
         do {
             System.out.println("Registration/Login");
@@ -24,12 +25,10 @@ public class Client {
             System.out.println("Input password:");
             password = sc.nextLine();
             // send the header as reg, it means the sending msg is a registration msg
-            String header = "reg";
-            sendString(header, out);
+            sendString(header[0], out);
             sendString(username, out);
             sendString(password, out);
         } while (!receiveString(in).equals(password));
-
         Thread t = new Thread(() -> {
             try {
                 while (true) { // receiving msg
@@ -48,21 +47,79 @@ public class Client {
             }
         });
         t.start();
-
         while (true) { // sending msg
-            directMsg(out, sc);
+            System.out.print("Type 1 to send a direct message, 2 to send a group message, 3 to check user list, 4 to exit");
+            System.out.println("Type @@quit to quit the session");
+            int choice = sc.nextInt();
+            sc.nextLine();
+            if (choice == 1) {
+                sendString(header[1] , out);
+                while (true){
+                    System.out.println("Enter a receiver name:");
+                    String receiver = sc.nextLine();
+                    if (receiver.equals("@@quit")) break;
+                    sendString(receiver, out);
+                    System.out.println("Input message and press ENTER");
+                    String message = username+": ";
+                    message += sc.nextLine();
+                    if (message.equals("@@quit")) break;
+                    sendString(message, out);
+                }
+            } else if (choice == 2) {
+                // create a group with member, the client will send out the member list to the server
+                // and the server will create a group with the member list
+                sendString(header[2], out);
+                // user can perform four operation: create/ join/ leave/ send with typing 1-4
+                // create a String array with 4 elements
+                String[] groupOperation = {"create", "join", "leave", "send", "show"};
+                System.out.print("Type 1 to create a group, 2 to join a group, 3 to leave a group, 4 to send a message, ");
+                // print type 5 to show group list
+                System.out.println("Type 5 to show group list");
+                int groupChoice = sc.nextInt();
+                sc.nextLine();
+                // send the group operation to the server
+                sendString(groupOperation[groupChoice-1], out);
+                if (groupChoice == 1) { // create a group
+                    // send out the creator name direct message, 2 to send a group messa
+                    System.out.println("Enter the group name:");
+                    String groupName = sc.nextLine();
+                    sendString(groupName, out);
+                    // user can keep adding member to the group until the user type !end
+                    while (true) {
+                        System.out.println("Enter a member name: (Enter !end to end)");
+                        String member = sc.nextLine();
+                        sendString(member, out);
+                        if (member.equals("!end")) break;
+                    }
+                }
+                if (groupChoice == 2) { // join a group
+                    System.out.println("Enter a group name:");
+                    String groupName = sc.nextLine();
+                    sendString(groupName, out); // send the group name to the server
+                    sendString(username, out); // send the username to the server
+                }
+                if (groupChoice == 3) { // leave a group
+                    System.out.println("Enter a group name:");
+                    String groupName = sc.nextLine();
+                    sendString(groupName, out); // send the group name to the server
+                    sendString(username, out); // send the username to the server
+                }
+                if (groupChoice == 4) { // send a message to a group
+                    System.out.println("Enter a group name:");
+                    String groupName = sc.nextLine();
+                    sendString(groupName, out); // send the group name to the server
+                    System.out.println("Input message and press ENTER");
+                    String message = username+": ";
+                    message += sc.nextLine();
+                    sendString(message, out); // send the message to the server
+                }
+            }else if (choice == 3) {
+                sendString(header[3], out);
+            }
+            else if (choice == 4) {
+                System.exit(0);
+            }
         }
-    }
-
-    private void directMsg(DataOutputStream out, Scanner sc) {
-        String header = "single";
-        sendString(header, out);
-        System.out.println("Enter a receiver name:");
-        String receiver = sc.nextLine();
-        sendString(receiver, out);
-        System.out.println("Input message and press ENTER");
-        String message = sc.nextLine();
-        sendString(message, out);
     }
 
     public String receiveString(DataInputStream in) {
@@ -94,10 +151,11 @@ public class Client {
     }
 
     public static void main(String[] args) {
+
         String serverIP = "127.0.0.1";
         int port = 12345;
         try {
-            new Client(serverIP, port);
+            new Client2(serverIP, port);
         } catch (Exception e) {
             e.printStackTrace();
         }

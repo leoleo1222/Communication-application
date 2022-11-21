@@ -14,7 +14,7 @@
          <content>
             <VBox fx:id="listPane" prefHeight="400.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="swapMode" mnemonicParsing="false" prefHeight="30.0" prefWidth="200.0" text="Group" />
+                  <Button fx:id="swapMode" mnemonicParsing="false" prefHeight="30.0" prefWidth="200.0" text="Individual" />
                </children>
             </VBox>
          </content>
@@ -25,7 +25,7 @@
          <bottom>
             <BorderPane prefHeight="33.0" prefWidth="400.0" BorderPane.alignment="CENTER">
                <right>
-                  <Button fx:id="upload" mnemonicParsing="false" prefHeight="33.0" prefWidth="55.0" text="Upload" BorderPane.alignment="CENTER" />
+                  <Button fx:id="upload" mnemonicParsing="false" prefHeight="33.0" prefWidth="55.0" text="Enter" BorderPane.alignment="CENTER" />
                </right>
                <center>
                   <TextField fx:id="txtInput" prefHeight="33.0" prefWidth="345.0" BorderPane.alignment="CENTER" />
@@ -33,7 +33,7 @@
             </BorderPane>
          </bottom>
          <top>
-            <Label prefHeight="30.0" prefWidth="400.0" style="-fx-border-color: grey; -fx-background-color: ALICEBLUE;" text=" Name" BorderPane.alignment="CENTER" />
+            <Label prefHeight="30.0" prefWidth="1000.0" style="-fx-border-color: grey; -fx-background-color: ALICEBLUE;" text=" Name" BorderPane.alignment="CENTER" />
          </top>
          <center>
             <ScrollPane fx:id="scrollPaneC" fitToHeight="true" fitToWidth="true" BorderPane.alignment="CENTER">

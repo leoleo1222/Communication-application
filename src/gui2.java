@@ -21,7 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class gui extends Application {
+public class gui2 extends Application {
     //private static Client client;
     ObservableList<Node> children;
     ObservableList<Node> listChildren;
@@ -30,7 +30,7 @@ public class gui extends Application {
     String[] header = {"reg", "single", "group", "showList", "exit"};
     private ArrayList<String> dmList;
     private String[][] groupList = new String[0][0];
-    private String receiver = "sam";
+    private String receiver = "jason";
 
 
     @FXML

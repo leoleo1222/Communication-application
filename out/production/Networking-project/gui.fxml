@@ -25,7 +25,7 @@
          <bottom>
             <BorderPane prefHeight="33.0" prefWidth="400.0" BorderPane.alignment="CENTER">
                <right>
-                  <Button fx:id="upload" mnemonicParsing="false" prefHeight="33.0" prefWidth="55.0" text="Upload" BorderPane.alignment="CENTER" />
+                  <Button fx:id="upload" mnemonicParsing="false" prefHeight="33.0" prefWidth="55.0" text="Enter" BorderPane.alignment="CENTER" />
                </right>
                <center>
                   <TextField fx:id="txtInput" prefHeight="33.0" prefWidth="345.0" BorderPane.alignment="CENTER" />
