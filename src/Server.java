@@ -76,7 +76,7 @@ public class Server {
                 clientSocket.getInetAddress(), clientSocket.getPort());
 
         DataInputStream in = new DataInputStream(clientSocket.getInputStream());
-
+        DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
         // extract data from offline file data
         Thread t = new Thread(() -> {
             try {
@@ -154,25 +154,30 @@ public class Server {
                     for(String member_name : group.get(group_name)){
                         System.out.println(member_name);
                     }
+                    // send a msg to the creator to tell him/her the group is created
+                    sendString("System: " + "Group " + group_name + " is created", out);
                 }
                 if(action.equals("join")){  // join a group
                     String group_name = receiveString(in);
                     if(group.containsKey(group_name)){
                         group.get(group_name).add(id);
-                        // forward("You joined group " + group_name, id, "System msg");
+                        sendString("System: " + "You joined group " + group_name, out);
+
                     }
                     else{
-                        // forward("Group " + group_name + " does not exist", id, "System msg");
+                        sendString("System: " + "Group " + group_name + " does not exist", out);
                     }
                 }
                 if(action.equals("leave")){ // leave a group
                     String group_name = receiveString(in);
                     if(group.containsKey(group_name)){
                         group.get(group_name).remove(id);
-                        // forward("You left group " + group_name, id, "System msg");
+                        sendString("System: " + "You left group " + group_name, out);
+
                     }
                     else{
-                        // forward("Group " + group_name + " does not exist", id, "System msg");
+                        sendString("System: " + "Group " + group_name + " does not exist", out);
+
                     }
                 }
                 if(action.equals("send")){  // send msg to a group
@@ -184,11 +189,14 @@ public class Server {
                         }
                     }
                     else{
-                        // forward("Group " + group_name + " does not exist", id, "System msg");
+                        sendString("System: " + "Group " + group_name + " does not exist", out);
                     }
                 }
                 
 
+            }
+            if(type.equals("showList")){    // show the client list
+                sendString("System: " + name_list.toString(), out);
             }
 
         }
