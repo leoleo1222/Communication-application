@@ -71,8 +71,10 @@ public class Client3 {
                 sendString(header[2], out);
                 // user can perform four operation: create/ join/ leave/ send with typing 1-4
                 // create a String array with 4 elements
-                String[] groupOperation = {"create", "join", "leave", "send"};
-                System.out.println("Type 1 to create a group, 2 to join a group, 3 to leave a group, 4 to send a message");
+                String[] groupOperation = {"create", "join", "leave", "send", "show"};
+                System.out.print("Type 1 to create a group, 2 to join a group, 3 to leave a group, 4 to send a message, ");
+                // print type 5 to show group list
+                System.out.println("Type 5 to show group list");
                 int groupChoice = sc.nextInt();
                 sc.nextLine();
                 // send the group operation to the server

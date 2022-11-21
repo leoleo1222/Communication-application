@@ -198,7 +198,14 @@ public class Server {
                         sendString("System: " + "Group " + group_name + " does not exist", out);
                     }
                 }
-
+                if (action.equals("show")) {  // show the group list
+                    StringBuilder group_list = new StringBuilder();
+                    group_list.append("Group list:\n");
+                    for (String group_name : group.keySet()) {
+                        group_list.append(group_name).append("\n");
+                    }
+                    sendString(group_list.toString(), out);
+                }
 
             }
             if (type.equals("showList")) {    // show the client list
