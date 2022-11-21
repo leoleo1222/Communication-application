@@ -79,8 +79,8 @@ public class PopupWindow extends Application{
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());
         LogInAndRegister.setOnMouseClicked(event -> {
-            username = txtUsername.getText();
-            password = txtPassword.getText();
+        username = txtUsername.getText();
+        password = txtPassword.getText();
             do {
                 sendString("reg", out);
                 sendString(username, out);

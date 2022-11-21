@@ -65,7 +65,7 @@ public class gui2 extends Application {
 
         Scene scene = new Scene(root, 1000, 650);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Chat");
+        primaryStage.setTitle("Chat2");
         primaryStage.setResizable(false);
         primaryStage.show();
 
@@ -100,14 +100,9 @@ public class gui2 extends Application {
     @FXML
     protected void initialize() {
         children = messagePane.getChildren();
-        listChildren = listPane.getChildren();
 
         messagePane.heightProperty().addListener(event -> {
             scrollPaneC.setVvalue(1);
-        });
-
-        listPane.heightProperty().addListener(event -> {
-            scrollPaneL.setVvalue(1);
         });
 
         txtInput.setOnKeyPressed(event -> {
@@ -157,7 +152,7 @@ public class gui2 extends Application {
 
         if (alignToRight)
             box.setAlignment(Pos.BASELINE_RIGHT);
-        Label label = new Label(text);
+        javafx.scene.control.Label label = new Label(text);
         label.setWrapText(true);
         box.getChildren().add(label);
         return box;
@@ -173,12 +168,6 @@ public class gui2 extends Application {
             sendString(text, out);
 
             System.out.println(receiver + "," + text);
-        });
-    }
-
-    private void displayMessage() {
-        Platform.runLater(() -> {
-            for(String s:Server.account.keySet()) listChildren.add(messageNode(s,true));
         });
     }
 
@@ -240,3 +229,4 @@ public class gui2 extends Application {
         launch(args);
     }
 }
+
