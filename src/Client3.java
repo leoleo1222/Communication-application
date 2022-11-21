@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Client2 {
+public class Client3 {
     public static String username = " "; // the username of the user
     private static String password = " "; // the password of the user
 
-    public Client2(String serverIP, int port) throws IOException {
+    public Client3(String serverIP, int port) throws IOException {
         System.out.printf("Connecting to %s:%d\n", serverIP, port);
         Socket socket = new Socket(serverIP, port);
         DataInputStream in = new DataInputStream(socket.getInputStream());
