@@ -23,28 +23,33 @@ public class Server {
         while (true) {
             print("Listening at port %d...\n", port);
             Socket clientSocket = srvSocket.accept();
-            // reading the header
-            DataInputStream in = new DataInputStream(clientSocket.getInputStream());
-            String header = receiveString(in);
-            // registration process start
-            if (header.equals("reg")) {
-                // get username
-                String username = receiveString(in);
-                // get password
-                String password = receiveString(in);
-                DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
-                // register the account
-                if (!account.containsKey(username)) {
-                    account.put(username, password);
-                    sendString(password, out);
-                } else {
-                    sendString(account.get(username), out);
+            try{
+                // reading the header
+                DataInputStream in = new DataInputStream(clientSocket.getInputStream());
+                String header = receiveString(in);
+                // registration process start
+                if (header.equals("reg")) {
+                    // get username
+                    String username = receiveString(in);
+                    // get password
+                    String password = receiveString(in);
+                    DataOutputStream out = new DataOutputStream(clientSocket.getOutputStream());
+                    // register the account
+                    if (!account.containsKey(username)) {
+                        account.put(username, password);
+                        sendString(password, out);
+                    } else {
+                        sendString(account.get(username), out);
+                    }
+                    // put the username into the static var.
+                    id = username;
+                    // print out the login username in server side for debug use
+                    System.out.println(id + " logged in");
                 }
-                // put the username into the static var.
-                id = username;
-                // print out the login username in server side for debug use
-                System.out.println(id + " logged in");
+            }catch (Exception e){
+                continue;
             }
+
 
             synchronized (socketList) {
                 // let the user online
@@ -262,9 +267,9 @@ public class Server {
         return res;
     }
 
-    public String receiveString(DataInputStream in) {
+    public String receiveString(DataInputStream in) throws IOException {
         String res = "";
-        try {
+//        try {
             byte[] buffer = new byte[1024];
             int len = in.readInt();
             while (len > 0) {
@@ -272,9 +277,9 @@ public class Server {
                 res += new String(buffer, 0, l);
                 len -= l;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         return res;
     }
 
