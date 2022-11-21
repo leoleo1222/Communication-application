@@ -118,7 +118,7 @@ public class Server {
                 // receiving the msg target from the client
                 String target = receiveString(in);
                 // receiving the msg from the client
-                StringBuilder msg = new StringBuilder("");
+                StringBuilder msg = new StringBuilder("Direct Msg->");
                 int size = in.readInt();
                 while (size > 0) {
                     int len = in.read(buffer, 0, Math.min(size, buffer.length));
@@ -190,7 +190,8 @@ public class Server {
                 if (action.equals("send")) {  // send msg to a group
                     String group_name = receiveString(in);
                     if (group.containsKey(group_name)) {
-                        String msg = receiveString(in);
+                        String msg = "Group("+ group_name +") ->";
+                        msg += receiveString(in);
                         for (String member : group.get(group_name)) {
                             forward(msg, member, "group");
                         }
