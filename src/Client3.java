@@ -14,7 +14,7 @@ public class Client3 {
         DataInputStream in = new DataInputStream(socket.getInputStream());
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         byte[] buffer = new byte[1024];
-        String[] header = {"reg", "single", "group"};
+        String[] header = {"reg", "single", "group", "showList", "exit"};
         Scanner sc = new Scanner(System.in);
         do {
             System.out.println("Registration/Login");
@@ -48,7 +48,7 @@ public class Client3 {
         });
         t.start();
         while (true) { // sending msg
-            System.out.print("Type 1 to send a direct message, 2 to send a group message, ");
+            System.out.print("Type 1 to send a direct message, 2 to send a group message, 3 to check user list, 4 to exit");
             System.out.println("Type @@quit to quit the session");
             int choice = sc.nextInt();
             sc.nextLine();
@@ -111,6 +111,11 @@ public class Client3 {
                     message += sc.nextLine();
                     sendString(message, out); // send the message to the server
                 }
+            }else if (choice == 3) {
+                sendString(header[3], out);
+            }
+            else if (choice == 4) {
+                System.exit(0);
             }
         }
     }
