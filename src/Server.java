@@ -142,6 +142,7 @@ public class Server {
             if(type.equals("group")){
                 String action = receiveString(in);
                 if(action.equals("create")){ // create a group
+                    String creater = receiveString(in);
                     String group_name = receiveString(in);
                     group.put(group_name, new ArrayList<>());
                     String member = receiveString(in);
@@ -149,7 +150,7 @@ public class Server {
                         group.get(group_name).add(member);
                         member = receiveString(in);
                     }
-                    forward("Group " + group_name + " created", id, "System msg");
+                    forward("Group " + group_name + " created", creater, "System msg");
                 }
                 if(action.equals("join")){  // join a group
                     String group_name = receiveString(in);
