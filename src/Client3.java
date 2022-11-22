@@ -78,22 +78,17 @@ public class Client3 {
         t.start();
         while (true) { // sending msg
             System.out.print("Type 1 to send a direct message, 2 to group function, 3 to check user list, 4 to view direct message, 5 to view group message, 6 to exit");
-            System.out.println(". Type @@quit to quit the session");
             int choice = sc.nextInt();
             sc.nextLine();
             if (choice == 1) {
                 sendString(header[1], out);
-                while (true) {
                     System.out.println("Enter a receiver name:");
                     String receiver = sc.nextLine();
-                    if (receiver.equals("@@quit")) break;
                     sendString(receiver, out);
                     System.out.println("Input message and press ENTER");
                     String message = username + ": ";
                     message += sc.nextLine();
-                    if (message.equals("@@quit")) break;
                     sendString(message, out);
-                }
             } else if (choice == 2) {
                 // create a group with member, the client will send out the member list to the server
                 // and the server will create a group with the member list
