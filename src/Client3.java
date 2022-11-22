@@ -62,13 +62,13 @@ public class Client3 {
                         String group = receive.substring(8, receive.indexOf(")"));
                         if (groupMsg.containsKey(group)) {
                             // push the msg after Group-> 
-                            groupMsg.get(group).push(receive);                  
+                            groupMsg.get(group).push(receive);
                         } else {
                             Stack<String> stack = new Stack<>();
                             stack.push(receive);
                             groupMsg.put(group, stack);
                         }
-                    }else
+                    } else
                         System.out.println(receive);
                 }
             } catch (Exception e) {
@@ -82,14 +82,14 @@ public class Client3 {
             int choice = sc.nextInt();
             sc.nextLine();
             if (choice == 1) {
-                sendString(header[1] , out);
-                while (true){
+                sendString(header[1], out);
+                while (true) {
                     System.out.println("Enter a receiver name:");
                     String receiver = sc.nextLine();
                     if (receiver.equals("@@quit")) break;
                     sendString(receiver, out);
                     System.out.println("Input message and press ENTER");
-                    String message = username+": ";
+                    String message = username + ": ";
                     message += sc.nextLine();
                     if (message.equals("@@quit")) break;
                     sendString(message, out);
@@ -107,7 +107,7 @@ public class Client3 {
                 int groupChoice = sc.nextInt();
                 sc.nextLine();
                 // send the group operation to the server
-                sendString(groupOperation[groupChoice-1], out);
+                sendString(groupOperation[groupChoice - 1], out);
                 if (groupChoice == 1) { // create a group
                     // send out the creator name direct message, 2 to send a group messa
                     System.out.println("Enter the group name:");
@@ -138,41 +138,47 @@ public class Client3 {
                     String groupName = sc.nextLine();
                     sendString(groupName, out); // send the group name to the server
                     System.out.println("Input message and press ENTER");
-                    String message = username+": ";
+                    String message = username + ": ";
                     message += sc.nextLine();
                     sendString(message, out); // send the message to the server
                 }
-            }else if (choice == 3) {
+            } else if (choice == 3) {
                 sendString(header[3], out);
-            }
-            else if (choice == 4) {
-                System.out.println("Received direct messages from:");
-                // list out all the sender name
-                for (String sender : singleMsg.keySet()) {
-                    System.out.println(sender);
-                }
-                System.out.println("Enter a sender name to view the message:");
-                String sender = sc.nextLine();
-                // print out all the message from the sender
-                while (!singleMsg.get(sender).isEmpty() && singleMsg.containsKey(sender)) {
-                    String message = singleMsg.get(sender).pop();
-                    System.out.println(message.substring(8));
+            } else if (choice == 4) {
+                if (singleMsg.isEmpty()) {
+                    System.out.println("No message from direct message");
+                } else {
+                    System.out.println("Received direct messages from:");
+                    // list out all the sender name
+                    for (String sender : singleMsg.keySet()) {
+                        System.out.println(sender);
+                    }
+                    System.out.println("Enter a sender name to view the message:");
+                    String sender = sc.nextLine();
+                    // print out all the message from the sender
+                    while (!singleMsg.get(sender).isEmpty() && singleMsg.containsKey(sender)) {
+                        String message = singleMsg.get(sender).pop();
+                        System.out.println(message.substring(8));
+                    }
                 }
 
             } else if (choice == 5) {
-                System.out.println("Received group messages from:");
-                // list out all the group name
-                for (String group : groupMsg.keySet()) {
-                    System.out.println(group);
+                if (groupMsg.isEmpty()) {
+                    System.out.println("No message from group message");
+                } else {
+                    System.out.println("Received group messages from:");
+                    // list out all the group name
+                    for (String group : groupMsg.keySet()) {
+                        System.out.println(group);
+                    }
+                    System.out.println("Enter a group name to view the message:");
+                    String group = sc.nextLine();
+                    // print out all the message from the group
+                    while (!groupMsg.get(group).isEmpty() && groupMsg.containsKey(group)) {
+                        String message = groupMsg.get(group).pop();
+                        System.out.println(message.substring(8));
+                    }
                 }
-                System.out.println("Enter a group name to view the message:");
-                String group = sc.nextLine();
-                // print out all the message from the group
-                while (!groupMsg.get(group).isEmpty() && groupMsg.containsKey(group)) {
-                    String message = groupMsg.get(group).pop();
-                    System.out.println(message.substring(7));
-                }
-                
             } else if (choice == 6) {
                 System.out.println("Program terminated");
                 System.exit(0);
