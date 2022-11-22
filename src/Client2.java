@@ -3,14 +3,16 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
-import java.util.Stack;
+
 
 public class Client2 {
     public static String username = " "; // the username of the user
     private static String password = " "; // the password of the user
-    private static HashMap<String, Stack<String>> singleMsg = new HashMap<>(); // the single msg
-    private static HashMap<String, Stack<String>> groupMsg = new HashMap<>(); // the group msg
+    private static HashMap<String, Queue<String>> singleMsg = new HashMap<>(); // the single msg
+    private static HashMap<String, Queue<String>> groupMsg = new HashMap<>(); // the group msg
 
     public Client2(String serverIP, int port) throws IOException {
         System.out.printf("Connecting to %s:%d\n", serverIP, port);
@@ -43,30 +45,32 @@ public class Client2 {
                         receive += new String(buffer, 0, len);
                         r_size -= len;
                     }
-                    // if the receive msg contain Single->, it means the msg is a single msg and add it to the singleMsg
+                    // if the received msg contain Single->, it means the msg is a single msg and add it to the singleMsg
                     // the xxx: is the sender name
                     if (receive.contains("Single->")) {
                         String sender = receive.substring(8, receive.indexOf(":"));
                         if (singleMsg.containsKey(sender)) {
                             // push the msg after Single-> 
-                            singleMsg.get(sender).push(receive);
+                            singleMsg.get(sender).add(receive);
                         } else {
-                            Stack<String> stack = new Stack<>();
-                            stack.push(receive);
-                            singleMsg.put(sender, stack);
+                            // create a new queue and push the msg after Single->
+                            Queue<String> q = new LinkedList<>();
+                            q.add(receive);
+                            singleMsg.put(sender, q);
                         }
                     }
-                    // if the receive msg contain Group->, it means the msg is a group msg and add it to the groupMsg
+                    // if the received msg contain Group->, it means the msg is a group msg and add it to the groupMsg
                     // the (xxx) is the group name
                     else if (receive.contains("Group->")) {
                         String group = receive.substring(8, receive.indexOf(")"));
                         if (groupMsg.containsKey(group)) {
                             // push the msg after Group-> 
-                            groupMsg.get(group).push(receive);
+                            groupMsg.get(group).add(receive);
                         } else {
-                            Stack<String> stack = new Stack<>();
-                            stack.push(receive);
-                            groupMsg.put(group, stack);
+                            // create a new queue and push the msg after Group->
+                            Queue<String> q = new LinkedList<>();
+                            q.add(receive);
+                            groupMsg.put(group, q);
                         }
                     } else
                         System.out.println(receive);
@@ -140,44 +144,52 @@ public class Client2 {
             } else if (choice == 3) {
                 sendString(header[3], out);
             } else if (choice == 4) {
+                // if the singleMsg is empty, it means there is no single msg
                 if (singleMsg.isEmpty()) {
-                    System.out.println("No message from direct message");
+                    System.out.println("No direct message received");
                 } else {
                     System.out.println("Received direct messages from:");
                     // list out all the sender name
                     for (String sender : singleMsg.keySet()) {
                         System.out.println(sender);
                     }
-                    System.out.println("Enter a sender name to view the message:");
-                    String sender = sc.nextLine();
-                    // print out all the message from the sender
-                    while (!singleMsg.get(sender).isEmpty() && singleMsg.containsKey(sender)) {
-                        String message = singleMsg.get(sender).pop();
-                        System.out.println(message.substring(8));
+                    System.out.println("Enter a receiver name:");
+                    String receiver = sc.nextLine();
+                    if (singleMsg.containsKey(receiver)) {
+                        while (!singleMsg.get(receiver).isEmpty()) {
+                            String msg = singleMsg.get(receiver).poll();
+                            System.out.println(msg.substring(8));                            
+                        }
+                    } else {
+                        System.out.println("No message");
                     }
                 }
-
             } else if (choice == 5) {
+                // if the groupMsg is empty, it means there is no group msg
                 if (groupMsg.isEmpty()) {
-                    System.out.println("No message from group message");
+                    System.out.println("No group message received");
                 } else {
                     System.out.println("Received group messages from:");
                     // list out all the group name
                     for (String group : groupMsg.keySet()) {
                         System.out.println(group);
                     }
-                    System.out.println("Enter a group name to view the message:");
+                    System.out.println("Enter a group name:");
                     String group = sc.nextLine();
-                    // print out all the message from the group
-                    while (!groupMsg.get(group).isEmpty() && groupMsg.containsKey(group)) {
-                        String message = groupMsg.get(group).pop();
-                        System.out.println(message.substring(8));
+                    if (groupMsg.containsKey(group)) {
+                        while (!groupMsg.get(group).isEmpty()) {
+                            String msg = groupMsg.get(group).poll();
+                            System.out.println(msg.substring(8));
+                        }
+                    } else {
+                        System.out.println("No message");
                     }
                 }
             } else if (choice == 6) {
-                System.out.println("Program terminated");
-                System.exit(0);
-            }
+                sendString(header[4], out);
+                break;
+
+            } 
         }
     }
 
