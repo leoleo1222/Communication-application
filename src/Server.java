@@ -61,6 +61,7 @@ public class Server {
             }
 
             Thread t = new Thread(() -> {
+                String name = id;
                 try {
                     // start passing msg with the server
                     serve(id, clientSocket);
@@ -70,9 +71,9 @@ public class Server {
 
                 synchronized (socketList) {
                     // print out the logout username in server side for debug use
-                    System.out.println(id + " is offline");
+                    System.out.println(name + " is offline");
                     // let the user offline
-                    socketList.remove(id);
+                    socketList.remove(name);
                 }
             });
             t.start();
@@ -110,7 +111,7 @@ public class Server {
             // further development: client can ask for the client list with some command (input: showList)
             int i = 1;
             StringBuilder name_list = new StringBuilder();
-            for (String username : socketList.keySet()) {
+            for (String username : account.keySet()) {
                 name_list.append("[").append(i++).append("]").append(username).append("\n");
             }
 //            out.writeInt(name_list.length());
@@ -122,7 +123,7 @@ public class Server {
                 // receiving the msg target from the client
                 String target = receiveString(in);
                 // receiving the msg from the client
-                StringBuilder msg = new StringBuilder("");
+                StringBuilder msg = new StringBuilder("Single->");
                 int size = in.readInt();
                 while (size > 0) {
                     int len = in.read(buffer, 0, Math.min(size, buffer.length));
@@ -194,7 +195,8 @@ public class Server {
                 if (action.equals("send")) {  // send msg to a group
                     String group_name = receiveString(in);
                     if (group.containsKey(group_name)) {
-                        String msg = receiveString(in);
+                        String msg = "Group->("+group_name+")";
+                        msg += receiveString(in);
                         for (String member : group.get(group_name)) {
                             forward(msg, member, "group");
                         }
@@ -208,7 +210,7 @@ public class Server {
                     for (String group_name : group.keySet()) {
                         group_list.append(group_name).append("\n");
                     }
-                    sendString(group_list.toString(), out);
+                    sendString("System: " + group_list.toString(), out);
                 }
 
             }

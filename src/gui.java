@@ -26,12 +26,10 @@ public class gui extends Application {
     ObservableList<Node> children;
     ObservableList<Node> listChildren;
 
-
     String[] header = {"reg", "single", "group", "showList", "exit"};
     private ArrayList<String> dmList;
     private String[][] groupList = new String[0][0];
-    private String receiver = "sam";
-
+    public String receiver;
 
     @FXML
     private ScrollPane scrollPaneL;
@@ -40,13 +38,19 @@ public class gui extends Application {
     @FXML
     private TextField txtInput;
     @FXML
+    private TextField nameText;
+    @FXML
     private Button upload;
     @FXML
     private Button swapMode;
     @FXML
+    private Button add;
+    @FXML
     private VBox messagePane;
     @FXML
     private VBox listPane;
+    @FXML
+    private Label receiverName;
 
     public String username, password;
     public DataOutputStream out;
@@ -56,7 +60,6 @@ public class gui extends Application {
     public static void print(String str, Object... o) {
         System.out.printf(str, o);
     }
-
 
     public void start(Stage primaryStage) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("gui.fxml"));
@@ -80,7 +83,11 @@ public class gui extends Application {
                         r_size -= len;
                     }
 
-                    receive(receive);
+                    if(receive.startsWith("System")){
+                        receiveName(receive.replaceAll("System: ", "Available users: \n"));
+                    }else
+                        receive(receive.replaceAll("Single->", ""));
+
                     System.out.println(receive);
                 }
             } catch (Exception e) {
@@ -94,6 +101,12 @@ public class gui extends Application {
     public void receive(String receive) {
         Platform.runLater(() -> {
             children.add(messageNode(receive, false));
+        });
+    }
+
+    public void receiveName(String receive) {
+        Platform.runLater(() -> {
+            listChildren.add(messageNode(receive, false));
         });
     }
 
@@ -115,11 +128,21 @@ public class gui extends Application {
                 sendMessage();
         });
 
+        nameText.setOnKeyPressed(event -> {
+            if (event.getCode().toString().equals("ENTER")) {
+                receiver = nameText.getText();
+                nameText.clear();
+                receiverName.setText(receiver);
+            }
+        });
+
         swapMode.setOnMouseClicked(event -> {
             swapMode();
         });
 
-
+        add.setOnMouseClicked(event -> {
+            sendString(header[3],out);
+        });
 
         upload.setOnMouseClicked(event -> {
             uploadFile();
@@ -140,7 +163,6 @@ public class gui extends Application {
             }
             else
                 System.out.print("Cancelled\n");
-
 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -173,12 +195,6 @@ public class gui extends Application {
             sendString(text, out);
 
             System.out.println(receiver + "," + text);
-        });
-    }
-
-    private void displayMessage() {
-        Platform.runLater(() -> {
-            for(String s:Server.account.keySet()) listChildren.add(messageNode(s,true));
         });
     }
 

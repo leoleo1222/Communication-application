@@ -21,7 +21,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class gui2 extends Application {
+public class gui3 extends Application {
     //private static Client client;
     ObservableList<Node> children;
     ObservableList<Node> listChildren;

@@ -7,14 +7,14 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml" >
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
    <left>
       <ScrollPane fx:id="scrollPaneL" fitToHeight="true" fitToWidth="true" BorderPane.alignment="CENTER">
          <content>
             <VBox fx:id="listPane" prefHeight="400.0" prefWidth="200.0">
                <children>
                   <Button fx:id="swapMode" mnemonicParsing="false" prefHeight="30.0" prefWidth="200.0" text="Individual" />
+                  <TextField fx:id="nameText" prefHeight="28.0" prefWidth="200.0" promptText="name" />
                </children>
             </VBox>
          </content>
@@ -33,7 +33,7 @@
             </BorderPane>
          </bottom>
          <top>
-            <Label prefHeight="30.0" prefWidth="1000.0" style="-fx-border-color: grey; -fx-background-color: ALICEBLUE;" text=" Name" BorderPane.alignment="CENTER" />
+            <Label fx:id="receiverName" prefHeight="30.0" prefWidth="1000.0" style="-fx-border-color: grey; -fx-background-color: ALICEBLUE;" BorderPane.alignment="CENTER" />
          </top>
          <center>
             <ScrollPane fx:id="scrollPaneC" fitToHeight="true" fitToWidth="true" BorderPane.alignment="CENTER">
@@ -44,4 +44,7 @@
          </center>
       </BorderPane>
    </center>
+   <bottom>
+      <Button fx:id="add" mnemonicParsing="false" prefHeight="23.0" prefWidth="202.0" text="Add" BorderPane.alignment="TOP_LEFT" />
+   </bottom>
 </BorderPane>
