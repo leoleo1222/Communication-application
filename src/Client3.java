@@ -79,9 +79,7 @@ public class Client3 {
                 while (true) {
                     System.out.println("Type @@quit to quit the session");
                     // while singleMsg next() is not null then print out the next() msg
-                    while (singleMsg.next() != null) {
                         System.out.println(singleMsg.next());
-                    }
                     System.out.println("Enter a receiver name:");
                     String receiver = sc.nextLine();
                     if (receiver.equals("@@quit"))
