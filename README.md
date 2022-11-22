@@ -5,7 +5,7 @@ This is a simple communication application that allows you to send messages to o
 | Class  |                                                                                                                                                                                     Description                                                                                                                                                                                     |
 | ------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
 | Client | This class is used to handle the message from the server. The message from the server can be direct message or group message. The message will be stored in a HashMap. The key of the HashMap is the sender name or group name. The value of the HashMap is a stack of message. The message will be stored in the stack. The message will be pop out when the user view the message |
-| Server |    It is used to handle the message from the client. The message from the client can be direct message or group message. The message will be stored in a HashMap. The key of the HashMap is the receiver name or group name. The value of the HashMap is a stack of message. The message will be stored in the stack. The message will be pop out when the user view the message    |
+| Server |    It is used to handle the message from the client.    |
 
 ## How to run the application
 
