@@ -206,7 +206,7 @@ public class Server {
                     for (String group_name : group.keySet()) {
                         group_list.append(group_name).append("\n");
                     }
-                    sendString(group_list.toString(), out);
+                    sendString("System: " + group_list.toString(), out);
                 }
 
             }
