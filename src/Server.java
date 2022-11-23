@@ -2,6 +2,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Server {
@@ -19,10 +20,11 @@ public class Server {
 
     public Server(int port) throws IOException {
         ServerSocket srvSocket = new ServerSocket(port);
-        //create 3 accounts at the beginning for testing
+        //create 3 accounts & 1 group at the beginning for testing
         account.put("leo","leo");
         account.put("jason","jason");
         account.put("sam","sam");
+        group.put("default",new ArrayList<>());
 
         while (true) {
             print("Listening at port %d...\n", port);
@@ -112,7 +114,7 @@ public class Server {
             int i = 1;
             StringBuilder name_list = new StringBuilder();
             for (String username : account.keySet()) {
-                name_list.append("[").append(i++).append("]").append(username).append("\n");
+                name_list.append(",").append(username);
             }
 //            out.writeInt(name_list.length());
 //            out.write(name_list.toString().getBytes(), 0, name_list.length());
@@ -206,9 +208,8 @@ public class Server {
                 }
                 if (action.equals("show")) {  // show the group list
                     StringBuilder group_list = new StringBuilder();
-                    group_list.append("Group list:\n");
                     for (String group_name : group.keySet()) {
-                        group_list.append(group_name).append("\n");
+                        group_list.append(",").append(group_name);
                     }
                     sendString("System: " + group_list.toString(), out);
                 }

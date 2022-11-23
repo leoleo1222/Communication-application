@@ -14,7 +14,6 @@
             <VBox fx:id="listPane" prefHeight="400.0" prefWidth="200.0">
                <children>
                   <Button fx:id="swapMode" mnemonicParsing="false" prefHeight="30.0" prefWidth="200.0" text="Individual" />
-                  <TextField fx:id="nameText" prefHeight="28.0" prefWidth="200.0" promptText="name" />
                </children>
             </VBox>
          </content>

@@ -27,7 +27,7 @@ public class gui2 extends Application {
     ObservableList<Node> listChildren;
 
     String[] header = {"reg", "single", "group", "showList", "exit"};
-    private ArrayList<String> dmList;
+    private String[][] dmList = new String[0][0];
     private String[][] groupList = new String[0][0];
     public String receiver;
 
@@ -83,10 +83,13 @@ public class gui2 extends Application {
                         r_size -= len;
                     }
 
-                    if(receive.startsWith("System")){
-                        receiveName(receive.replaceAll("System: ", "Available users: \n"));
-                    }else
-                        receive(receive.replaceAll("Single->", ""));
+                    if(swapMode.getText().equals("Individual")){
+                        if(receive.startsWith("System")){ listIndividual(receive);
+                        }else receive(receive.replaceAll("Single->", ""));
+                    }else{
+                        if(receive.startsWith("System")){ listGroup(receive);
+                        }else receive(receive.replaceAll("Single->", ""));
+                    }
 
                     System.out.println(receive);
                 }
@@ -104,11 +107,6 @@ public class gui2 extends Application {
         });
     }
 
-    public void receiveName(String receive) {
-        Platform.runLater(() -> {
-            listChildren.add(messageNode(receive, false));
-        });
-    }
 
     @FXML
     protected void initialize() {
@@ -128,24 +126,21 @@ public class gui2 extends Application {
                 sendMessage();
         });
 
-        nameText.setOnKeyPressed(event -> {
-            if (event.getCode().toString().equals("ENTER")) {
-                receiver = nameText.getText();
-                nameText.clear();
-                receiverName.setText(receiver);
-            }
-        });
-
         swapMode.setOnMouseClicked(event -> {
             swapMode();
         });
 
         add.setOnMouseClicked(event -> {
-            sendString(header[3],out);
+            if(swapMode.getText().equals("Individual")) {
+                sendString(header[3], out);
+            }else{
+                sendString(header[2],out);
+                sendString("show",out);
+            }
         });
 
         upload.setOnMouseClicked(event -> {
-            uploadFile();
+            sendMessage();
         });
 
         try {
@@ -201,7 +196,7 @@ public class gui2 extends Application {
     private void swapMode() {
         Platform.runLater(() -> {
             // Clear list
-            listPane = new VBox();
+            listPane.getChildren().remove(1, listPane.getChildren().size());
             listChildren = listPane.getChildren();
 
             // Add list
@@ -250,6 +245,77 @@ public class gui2 extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void listIndividual(String receive) {
+        Platform.runLater(() -> {
+            String[] list = receive.split(",");
+            listPane.getChildren().remove(1, listPane.getChildren().size());
+            for (int i = 1; i < list.length; i++) addBox(list[i]);
+        });
+    }
+
+    public void listGroup(String receive) {
+        Platform.runLater(() -> {
+            String[] list = receive.split(",");
+            listPane.getChildren().remove(1, listPane.getChildren().size());
+            for (int i = 1; i < list.length; i++) addBox(list[i]);
+        });
+    }
+
+    private void addBox(String name) {
+        HBox box = new HBox();
+        box.paddingProperty().setValue(new Insets(5, 10, 0, 5));
+        javafx.scene.control.Label label = new Label(name);
+        label.setWrapText(true);
+        box.getChildren().add(label);
+        box.setOnMouseClicked(event -> {
+            addToList(name);
+        });
+        listPane.getChildren().add(box);
+    }
+
+    private void addToList(String individual) {
+        String[][] newDmList = new String[dmList.length+1][1];
+        for (int i = 0; i < dmList.length; i++) {
+            newDmList[i] = new String[dmList[i].length];
+            if (dmList[i][0].equals(individual)) {
+                System.out.println("duplicated person");
+                restoreList();
+                return;
+            }
+            for (int j = 0; j < dmList[i].length; j++) {
+                newDmList[i][j] = dmList[i][j];
+            }
+        }
+        newDmList[dmList.length][0] = individual;
+        dmList = newDmList;
+        restoreList();
+    }
+
+    private void restoreList() {
+        listPane.getChildren().remove(1, listPane.getChildren().size());
+        for (int i = 0; i < dmList.length; i++) dmBox(dmList[i]);
+    }
+
+    private void dmBox(String[] individual) {
+        HBox box = new HBox();
+        box.paddingProperty().setValue(new Insets(5, 10, 0, 5));
+        javafx.scene.control.Label label = new Label(individual[0]);
+        label.setWrapText(true);
+        box.getChildren().add(label);
+        box.setOnMouseClicked(event -> {
+            changeDm(individual);
+            receiver = individual[0];
+            receiverName.setText(receiver);
+            System.out.println(receiver);
+        });
+        listPane.getChildren().add(box);
+    }
+
+    private void changeDm(String[] dms) {
+        children.clear();
+        for(int i = 1; i < dms.length; i++) children.add(messageNode(dms[i], false));
     }
 
     public static void main(String[] args) throws IOException {
