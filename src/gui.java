@@ -26,12 +26,10 @@ public class gui extends Application {
     ObservableList<Node> children;
     ObservableList<Node> listChildren;
 
-
     String[] header = {"reg", "single", "group", "showList", "exit"};
     private String[][] dmList = new String[0][0];
     private String[][] groupList = new String[0][0];
-    private String receiver = "sam";
-
+    public String receiver;
 
     @FXML
     private ScrollPane scrollPaneL;
@@ -40,13 +38,19 @@ public class gui extends Application {
     @FXML
     private TextField txtInput;
     @FXML
+    private TextField nameText;
+    @FXML
     private Button upload;
     @FXML
     private Button swapMode;
     @FXML
+    private Button add;
+    @FXML
     private VBox messagePane;
     @FXML
     private VBox listPane;
+    @FXML
+    private Label receiverName;
 
     public String username, password;
     public DataOutputStream out;
@@ -56,7 +60,6 @@ public class gui extends Application {
     public static void print(String str, Object... o) {
         System.out.printf(str, o);
     }
-
 
     public void start(Stage primaryStage) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("gui.fxml"));
@@ -80,13 +83,9 @@ public class gui extends Application {
                         r_size -= len;
                     }
 
-<<<<<<< Updated upstream
-                    receive(receive);
-=======
                     if(receive.startsWith("System")){ listIndividual(receive);
                     }else receive(receive.replaceAll("Single->", ""));
 
->>>>>>> Stashed changes
                     System.out.println(receive);
                 }
             } catch (Exception e) {
@@ -103,16 +102,18 @@ public class gui extends Application {
         });
     }
 
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
     @FXML
     protected void initialize() {
         children = messagePane.getChildren();
+        listChildren = listPane.getChildren();
 
         messagePane.heightProperty().addListener(event -> {
             scrollPaneC.setVvalue(1);
+        });
+
+        listPane.heightProperty().addListener(event -> {
+            scrollPaneL.setVvalue(1);
         });
 
         txtInput.setOnKeyPressed(event -> {
@@ -124,13 +125,9 @@ public class gui extends Application {
             swapMode();
         });
 
-<<<<<<< Updated upstream
-
-=======
         add.setOnMouseClicked(event -> {
             sendString(header[3], out);
         });
->>>>>>> Stashed changes
 
         upload.setOnMouseClicked(event -> {
             uploadFile();
@@ -152,7 +149,6 @@ public class gui extends Application {
             else
                 System.out.print("Cancelled\n");
 
-
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -168,7 +164,7 @@ public class gui extends Application {
 
         if (alignToRight)
             box.setAlignment(Pos.BASELINE_RIGHT);
-        javafx.scene.control.Label label = new Label(text);
+        Label label = new Label(text);
         label.setWrapText(true);
         box.getChildren().add(label);
         return box;
@@ -209,7 +205,7 @@ public class gui extends Application {
 
     private void uploadFile() {
         Platform.runLater(() -> {
-            
+
         });
     }
 

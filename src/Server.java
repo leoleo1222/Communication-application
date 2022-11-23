@@ -6,10 +6,10 @@ import java.util.HashMap;
 
 public class Server {
     // this store the online user with their socket
-    HashMap<String, Socket> socketList = new HashMap<>();
+    public static HashMap<String, Socket> socketList = new HashMap<>();
     // this store their account information, we can check if the account exist with containsKey(..)
-    HashMap<String, String> account = new HashMap<>();
-    HashMap<String, ArrayList<String>> group = new HashMap<>();
+    public static HashMap<String, String> account = new HashMap<>();
+    public static HashMap<String, ArrayList<String>> group = new HashMap<>();
 
     private static String id = "";
 
@@ -19,6 +19,10 @@ public class Server {
 
     public Server(int port) throws IOException {
         ServerSocket srvSocket = new ServerSocket(port);
+        //create 3 accounts at the beginning for testing
+        account.put("leo","leo");
+        account.put("jason","jason");
+        account.put("sam","sam");
 
         while (true) {
             print("Listening at port %d...\n", port);
@@ -57,6 +61,7 @@ public class Server {
             }
 
             Thread t = new Thread(() -> {
+                String name = id;
                 try {
                     // start passing msg with the server
                     serve(id, clientSocket);
@@ -66,9 +71,9 @@ public class Server {
 
                 synchronized (socketList) {
                     // print out the logout username in server side for debug use
-                    System.out.println(id + " is offline");
+                    System.out.println(name + " is offline");
                     // let the user offline
-                    socketList.remove(id);
+                    socketList.remove(name);
                 }
             });
             t.start();
@@ -106,13 +111,8 @@ public class Server {
             // further development: client can ask for the client list with some command (input: showList)
             int i = 1;
             StringBuilder name_list = new StringBuilder();
-<<<<<<< Updated upstream
-            for (String username : socketList.keySet()) {
-                name_list.append("[").append(i++).append("]").append(username).append("\n");
-=======
             for (String username : account.keySet()) {
                 name_list.append(",").append(username);
->>>>>>> Stashed changes
             }
 //            out.writeInt(name_list.length());
 //            out.write(name_list.toString().getBytes(), 0, name_list.length());
@@ -123,7 +123,7 @@ public class Server {
                 // receiving the msg target from the client
                 String target = receiveString(in);
                 // receiving the msg from the client
-                StringBuilder msg = new StringBuilder("");
+                StringBuilder msg = new StringBuilder("Single->");
                 int size = in.readInt();
                 while (size > 0) {
                     int len = in.read(buffer, 0, Math.min(size, buffer.length));
@@ -195,7 +195,8 @@ public class Server {
                 if (action.equals("send")) {  // send msg to a group
                     String group_name = receiveString(in);
                     if (group.containsKey(group_name)) {
-                        String msg = receiveString(in);
+                        String msg = "Group->("+group_name+")";
+                        msg += receiveString(in);
                         for (String member : group.get(group_name)) {
                             forward(msg, member, "group");
                         }
@@ -209,7 +210,7 @@ public class Server {
                     for (String group_name : group.keySet()) {
                         group_list.append(group_name).append("\n");
                     }
-                    sendString(group_list.toString(), out);
+                    sendString("System: " + group_list.toString(), out);
                 }
 
             }
