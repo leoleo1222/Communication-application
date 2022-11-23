@@ -106,8 +106,13 @@ public class Server {
             // further development: client can ask for the client list with some command (input: showList)
             int i = 1;
             StringBuilder name_list = new StringBuilder();
+<<<<<<< Updated upstream
             for (String username : socketList.keySet()) {
                 name_list.append("[").append(i++).append("]").append(username).append("\n");
+=======
+            for (String username : account.keySet()) {
+                name_list.append(",").append(username);
+>>>>>>> Stashed changes
             }
 //            out.writeInt(name_list.length());
 //            out.write(name_list.toString().getBytes(), 0, name_list.length());
