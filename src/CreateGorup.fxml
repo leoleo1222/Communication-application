@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <Label alignment="CENTER" prefHeight="30.0" prefWidth="400.0" style="-fx-border-color: grey; -fx-background-color: ALICEBLUE;" text="Create New Group" BorderPane.alignment="CENTER" />
+   </top>
+   <center>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <GridPane hgap="10.0" prefHeight="346.0" prefWidth="400.0" style="-fx-background-color: white;" vgap="10.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="160.0" minWidth="10.0" prefWidth="133.0" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="218.0" minWidth="10.0" prefWidth="157.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints maxHeight="113.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="125.0" minHeight="0.0" prefHeight="26.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="125.0" minHeight="10.0" prefHeight="29.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="197.0" minHeight="10.0" prefHeight="197.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label alignment="CENTER" prefHeight="17.0" prefWidth="115.0" text="Group Name:" />
+                  <TextField fx:id="groupName" GridPane.columnIndex="1" />
+                  <Label alignment="CENTER" prefHeight="17.0" prefWidth="111.0" text="Add Member: " GridPane.rowIndex="1" />
+                  <TextField fx:id="memberAdd" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <ScrollPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: white;" GridPane.rowIndex="3">
+                     <content>
+                        <VBox prefHeight="195.0" prefWidth="158.0" style="-fx-background-color: white;" />
+                     </content>
+                  </ScrollPane>
+                  <ScrollPane prefHeight="200.0" prefWidth="150.0" style="-fx-background-color: white;" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                     <content>
+                        <VBox prefHeight="194.0" prefWidth="216.0" style="-fx-background-color: white;" />
+                     </content>
+                  </ScrollPane>
+                  <ToolBar prefHeight="40.0" prefWidth="200.0" style="-fx-background-color: white;" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <items>
+                      <Button fx:id="addGN" mnemonicParsing="false" text="Add Group Name" />
+                        <Button fx:id="addM" alignment="CENTER" mnemonicParsing="false" text="Add Member" />
+                    </items>
+                  </ToolBar>
+               </children>
+            </GridPane>
+         </children>
+      </VBox>
+   </center>
+   <bottom>
+      <Button fx:id="done" alignment="CENTER" mnemonicParsing="false" prefWidth="100.0" text="Done" BorderPane.alignment="CENTER_RIGHT" />
+   </bottom>
+</BorderPane>

@@ -27,48 +27,44 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public class PopupWindow extends Application{
-    // for login
-    @FXML private TextField txtUsername;
-    @FXML private PasswordField txtPassword;
-
-    /// ComboBox requires the data type of its child items
-    @FXML private Button LogInAndRegister;
-    @FXML private ComboBox<String> cbxFlag;
-    @FXML private CheckBox chkAgreement;
-    @FXML private RadioButton rdoDay, rdoNight;
-    @FXML private Button btnLogin, btnCancel;
+public class createGroup extends Application {
+    //user input
+    @FXML private TextField groupName;
+    @FXML private TextField memberAdd;
+    @FXML private Button done;
+    @FXML private Button addGN;
+    @FXML private Button addM;
 
     Stage stage;
 
-    public String username, password, flag;
-    public boolean loggedIn = false;
+    public String groupname, member;
+    public boolean loggedIn = true;
 
     public DataOutputStream out;
     public DataInputStream in;
 
-    public PopupWindow() throws IOException {
+    public createGroup() throws IOException {
         stage = new Stage();
         FXMLLoader loader =
-                new FXMLLoader(getClass().getResource("PopupWindow.fxml"));
+                new FXMLLoader(getClass().getResource("CreateGorup.fxml"));
         loader.setController(this);
         Parent root = loader.load();
-        Scene scene = new Scene(root, 300, 280);
+        Scene scene = new Scene(root, 400, 400);
         stage.setScene(scene);
-        stage.setTitle("Log in");
+        stage.setTitle("Create New group");
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setResizable(false);
         stage.showAndWait();
     }
 
     public void start(Stage primaryStage) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("PopupWindow.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("CreateGorup.fxml"));
         loader.setController(this);
         Parent root = loader.load();
         primaryStage.setScene(new Scene(root));
-        primaryStage.setTitle("Welcome");
-        primaryStage.setMinWidth(300);
-        primaryStage.setMinHeight(500);
+        primaryStage.setTitle("Create New Group");
+        primaryStage.setMinWidth(400);
+        primaryStage.setMinHeight(400);
         primaryStage.show();
     }
 
@@ -76,18 +72,25 @@ public class PopupWindow extends Application{
     protected void initialize() throws IOException{
         Socket socket = new Socket("127.0.0.1", 12345);
 
-        in = new DataInputStream(socket.getInputStream());
-        out = new DataOutputStream(socket.getOutputStream());
-        LogInAndRegister.setOnMouseClicked(event -> {
-        username = txtUsername.getText();
-        password = txtPassword.getText();
-            do {
-                sendString("reg", out);
-                sendString(username, out);
-                sendString(password, out);
-            } while (!receiveString(in).equals(password));
-            loggedIn = true;
+        in = gui.in;
+        out = gui.out;
+        System.out.println(out.toString());
+        done.setOnMouseClicked(event -> {
+            sendString("!end",out);
             stage.close();
+        });
+
+        addGN.setOnMouseClicked(event -> {
+            groupname = groupName.getText();
+            sendString("group", out);
+            sendString("create",out);
+            sendString(groupname, out);
+        });
+
+        addM.setOnMouseClicked(event -> {
+            member = memberAdd.getText();
+            sendString(member, out);
+            memberAdd.clear();
         });
     }
 
@@ -118,4 +121,5 @@ public class PopupWindow extends Application{
             e.printStackTrace();
         }
     }
+
 }

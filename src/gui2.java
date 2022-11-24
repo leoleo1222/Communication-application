@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.DataInputStream;
+import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,6 +47,8 @@ public class gui2 extends Application {
     @FXML
     private Button add;
     @FXML
+    private Button createGroup;
+    @FXML
     private VBox messagePane;
     @FXML
     private VBox listPane;
@@ -53,8 +56,8 @@ public class gui2 extends Application {
     private Label receiverName;
 
     public String username, password;
-    public DataOutputStream out;
-    public DataInputStream in;
+    public static DataOutputStream out;
+    public static DataInputStream in;
     public byte[] buffer = new byte[1024];
 
     public static void print(String str, Object... o) {
@@ -71,6 +74,7 @@ public class gui2 extends Application {
         primaryStage.setTitle("Chat");
         primaryStage.setResizable(false);
         primaryStage.show();
+        createGroup.setVisible(false);
 
         Thread t = new Thread(() -> {
             try {
@@ -88,7 +92,7 @@ public class gui2 extends Application {
                         }else receive(receive.replaceAll("Single->", ""));
                     }else{
                         if(receive.startsWith("System")){ listGroup(receive);
-                        }else receive(receive.replaceAll("Single->", ""));
+                        }else receive(receive.replaceAll("Group->", ""));
                     }
 
                     System.out.println(receive);
@@ -127,7 +131,24 @@ public class gui2 extends Application {
         });
 
         swapMode.setOnMouseClicked(event -> {
+            if(swapMode.getText().equals("Individual")) createGroup.setVisible(true);
+            else createGroup.setVisible(false);
             swapMode();
+        });
+
+        createGroup.setOnMouseClicked(event -> {
+            try {
+                createGroup pop = new createGroup();
+                if (pop.loggedIn) {
+                    pop.in = in;
+                    pop.out = out;
+                }
+                else
+                    System.out.print("Cancelled\n");
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         });
 
         add.setOnMouseClicked(event -> {
