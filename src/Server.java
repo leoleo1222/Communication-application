@@ -7,7 +7,8 @@ import java.util.HashMap;
 public class Server {
     // this store the online user with their socket
     HashMap<String, Socket> socketList = new HashMap<>();
-    // this store their account information, we can check if the account exist with containsKey(..)
+    // this store their account information, we can check if the account exist with
+    // containsKey(..)
     HashMap<String, String> account = new HashMap<>();
     HashMap<String, ArrayList<String>> group = new HashMap<>();
 
@@ -49,7 +50,6 @@ public class Server {
             } catch (Exception e) {
                 continue;
             }
-
 
             synchronized (socketList) {
                 // let the user online
@@ -103,15 +103,11 @@ public class Server {
         t.start();
 
         while (true) {
-            // not necessary, just telling the client list to the client side
-            // further development: client can ask for the client list with some command (input: showList)
             int i = 1;
             StringBuilder name_list = new StringBuilder();
             for (String username : socketList.keySet()) {
                 name_list.append("[").append(i++).append("]").append(username).append("\n");
             }
-//            out.writeInt(name_list.length());
-//            out.write(name_list.toString().getBytes(), 0, name_list.length());
             // receive the msg type from client
             String type = receiveString(in);
             // if the msg type is "single", then it is a normal msg from client to client
@@ -137,11 +133,12 @@ public class Server {
                 }
 
                 if (socketList.containsKey(target)) {
-//                forward(name_list.toString(), target, "System msg");
+                    // forward(name_list.toString(), target, "System msg");
                     forward(msg.toString(), target, type);
                 } else {
                     // This is a debug msg, it will show when the receiver is offline
-                    if (account.containsKey(target)) System.out.println(target + " msg will store to a file");
+                    if (account.containsKey(target))
+                        System.out.println(target + " msg will store to a file");
                 }
             }
             if (type.equals("group")) {
@@ -167,7 +164,7 @@ public class Server {
                     // send a msg to the creator to tell him/her the group is created
                     sendString("System: " + "Group " + group_name + " is created by " + name, out);
                 }
-                if (action.equals("join")) {  // join a group
+                if (action.equals("join")) { // join a group
                     String group_name = receiveString(in);
                     if (group.containsKey(group_name)) {
                         group.get(group_name).add(id);
@@ -188,10 +185,10 @@ public class Server {
 
                     }
                 }
-                if (action.equals("send")) {  // send msg to a group
+                if (action.equals("send")) { // send msg to a group
                     String group_name = receiveString(in);
                     if (group.containsKey(group_name)) {
-                        String msg = "Group->("+group_name+")";
+                        String msg = "Group->(" + group_name + ")";
                         msg += receiveString(in);
                         for (String member : group.get(group_name)) {
                             forward(msg, member, "group");
@@ -200,7 +197,7 @@ public class Server {
                         sendString("System: " + "Group " + group_name + " does not exist", out);
                     }
                 }
-                if (action.equals("show")) {  // show the group list
+                if (action.equals("show")) { // show the group list
                     StringBuilder group_list = new StringBuilder();
                     group_list.append("Group list:\n");
                     for (String group_name : group.keySet()) {
@@ -210,10 +207,35 @@ public class Server {
                 }
 
             }
-            if (type.equals("showList")) {    // show the client list
+            if (type.equals("showList")) { // show the client list
                 sendString("System: " + name_list.toString(), out);
             }
-
+            if (type.equals("upload")) { // exit the server
+                // get the sender name
+                String sender = receiveString(in); // sender
+                new File("/" + sender).mkdir(); // create a folder for the sender
+                int remain = in.readInt(); // the size of the file
+                String filename = ""; // the name of the file
+                while (remain > 0) { // receive the file name
+                    int len = in.read(buffer, 0, Math.min(remain, buffer.length)); // read the file name
+                    filename += new String(buffer, 0, len); // append the file name
+                    remain -= len; // update the remain size
+                } 
+                // create a file with the name inside the sender folder
+                File file = new File("/" + sender + "/" + filename);
+                FileOutputStream fout = new FileOutputStream(file); // create a file output stream
+                long size = in.readLong(); // read the file size
+                System.out.printf("Downloading %s (%d bytes) ...\n", filename, size); // print the file name and size
+                while (size > 0) { // receive the file
+                    int len = in.read(buffer, 0, (int) Math.min(size, buffer.length)); // read the file
+                    fout.write(buffer, 0, len); // write the file
+                    size -= len; // update the remain size
+                    System.out.printf("."); // print a dot to show the progress
+                }
+                System.out.printf("Completed!\n"); // print the complete msg
+                fout.flush(); // flush the file output stream
+                fout.close(); // close the file output stream
+            }
         }
     }
 
@@ -223,7 +245,8 @@ public class Server {
             try {
                 // the socket list will be the target socket == socketList.get(target)
                 DataOutputStream out = new DataOutputStream(socketList.get(target).getOutputStream());
-                // msg show in server side telling the msg detail in each time client forwarding msg
+                // msg show in server side telling the msg detail in each time client forwarding
+                // msg
                 System.out.println("Type: " + type);
                 System.out.println("Target: " + target);
                 System.out.println("Msg: " + msg);
@@ -274,7 +297,7 @@ public class Server {
 
     public String receiveString(DataInputStream in) throws IOException {
         String res = "";
-//        try {
+        // try {
         byte[] buffer = new byte[1024];
         int len = in.readInt();
         while (len > 0) {
@@ -282,9 +305,9 @@ public class Server {
             res += new String(buffer, 0, l);
             len -= l;
         }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
         return res;
     }
 

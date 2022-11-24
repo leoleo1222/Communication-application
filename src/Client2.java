@@ -195,31 +195,23 @@ public class Client2 {
             } else if (choice == 6) {
                 sendString(header[4], out); // send the header to the server
                 sendString(username, out); // send the username to the server
-
                 System.out.printf("Input the file path:\n");
                 String filepath = sc.nextLine(); // get the file path
-
                 File file = new File(filepath); // create a file object
                 if (!file.exists() && file.isDirectory()) throw new IOException("Invalid path!"); // check if the file exists
-
                 FileInputStream fin = new FileInputStream(file); // create a file input stream
-
                 byte[] filename = file.getName().getBytes(); // get the file name
                 out.writeInt(filename.length);  // send the file name length to the server
                 out.write(filename, 0, filename.length); // send the file name to the server
-
                 long size = file.length();  // get the file size
                 out.writeLong(size);    // send the file size to the server
-
                 System.out.printf("Uploading %s (%d bytes)", filepath, size);   // print out the file name and size
-
                 while (size > 0) {
                     int len = fin.read(buffer, 0, (int) Math.min(size, buffer.length)); // read the file
                     out.write(buffer, 0, len);  // send the file to the server
                     size -= len;    // update the file size
                     System.out.printf("."); // print out a dot
                 }
-
                 System.out.println("Complete!");    // print out complete
                 out.flush();    // flush the output stream
                 fin.close();
