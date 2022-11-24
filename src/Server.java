@@ -3,6 +3,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class Server {
     // this store the online user with their socket
@@ -88,10 +89,8 @@ public class Server {
             try {
                 for (String username : socketList.keySet()) {
                     if (new File(username + ".txt").exists() && socketList.containsKey(username)) {
-                        String offline_msg = get_offline_data(new File(username + ".txt"));
-                        // split the offline_msg with \n
-                        String[] offline_msg_list = offline_msg.split("\n");
-                        for (String msg : offline_msg_list) {
+                        String[] offline_msg = get_offline_data(new File(username + ".txt"));
+                        for (String msg : offline_msg) {
                             // get the msg, the msg is after the ":"
                             String messageDetail = msg.substring(msg.indexOf(":") + 2);
                             if (messageDetail.startsWith("!file")) {
@@ -114,7 +113,7 @@ public class Server {
                                 out.flush(); // flush the output stream
                                 fin.close();
                             } else
-                                forward(offline_msg, username, "offline");
+                                forward(msg, username, "offline");
                         }
                         if (new File(username + ".txt").delete())
                             System.out.println("Deleted " + username + "'s offline data file");
@@ -150,6 +149,8 @@ public class Server {
                         File file = new File(target + ".txt");
                         FileOutputStream out_file = new FileOutputStream(file, true);
                         System.out.println("Saved into " + target);
+                        // write the Single-> into the offline file
+                        out_file.write("Single->".getBytes());
                         out_file.write(buffer, 0, len);
                         out_file.write('\n');
                         out_file.flush();
@@ -331,25 +332,14 @@ public class Server {
         }
     }
 
-    private String get_offline_data(File file) {
-        String res = "";
-        try {
-            FileInputStream in = new FileInputStream(file);
-            long size = file.length();
-            byte[] buffer = new byte[1024];
-
-            while (size > 0) {
-                int len = in.read(buffer, 0, buffer.length);
-                size -= len;
-                res += new String(buffer, 0, len);
-            }
-
-            in.close();
-            return res;
-        } catch (Exception e) {
-            System.out.println("Error in getting file data");
+    private String[] get_offline_data(File file) throws FileNotFoundException {
+        ArrayList<String> list = new ArrayList<>();
+        Scanner sc = new Scanner(file);
+        while (sc.hasNextLine()) {
+            list.add(sc.nextLine());
         }
-        return res;
+        // return list as a string array
+        return list.toArray(new String[list.size()]);
     }
 
     public String receiveString(DataInputStream in) throws IOException {
