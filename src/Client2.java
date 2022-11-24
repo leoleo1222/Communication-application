@@ -20,7 +20,7 @@ public class Client2 {
         DataInputStream in = new DataInputStream(socket.getInputStream());
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         byte[] buffer = new byte[1024];
-        String[] header = {"reg", "single", "group", "showList", "exit"};
+        String[] header = {"reg", "single", "group", "showList", "upload", "download", "exit"};
         Scanner sc = new Scanner(System.in);
         do {
             System.out.println("Registration/Login");
@@ -81,7 +81,7 @@ public class Client2 {
         });
         t.start();
         while (true) { // sending msg
-            System.out.print("Type 1 to send a direct message, 2 to group function, 3 to check user list, 4 to view direct message, 5 to view group message, 6 to exit");
+            System.out.println("Type 1 to send a direct message, 2 to group function, 3 to check user list, 4 to view direct message, 5 to view group message, 6 to upload file, 7 to exit");
             int choice = sc.nextInt();
             sc.nextLine();
             if (choice == 1) {
@@ -185,11 +185,16 @@ public class Client2 {
                         System.out.println("No message");
                     }
                 }
-            } else if (choice == 6) {
+            }
+            else if (choice == 6) {
                 sendString(header[4], out);
-                break;
-
-            } 
+                System.out.println("Enter a file name:");
+                String fileName = sc.nextLine();
+            }
+            else if (choice == 7) {
+                System.out.println("Program terminated");
+                System.exit(0);
+            }
         }
     }
 
