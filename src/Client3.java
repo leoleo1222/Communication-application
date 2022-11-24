@@ -77,8 +77,7 @@ public class Client3 {
                             groupMsg.put(group, q);
                         }
                     } else if (receive.contains("download")) {
-                        if (new File(username + "_download").mkdir())
-                            System.out.println("Created " + username + " dir");
+                        new File(username + "_download").mkdir();
                         int remain = in.readInt(); // the size of the file
                         String filename = ""; // the name of the file
                         while (remain > 0) { // receive the file name
@@ -86,6 +85,8 @@ public class Client3 {
                             filename += new String(buffer, 0, len); // append the file name
                             remain -= len; // update the remain size
                         }
+                        // the file name is after !file:
+                        filename = filename.substring(filename.indexOf("!file:") + 6);
                         // create a file with the name inside the username folder
                         File file = new File(username + "_download" + "/" + filename);
                         FileOutputStream fout = new FileOutputStream(file); // create a file output stream
@@ -101,7 +102,7 @@ public class Client3 {
                         System.out.printf("Completed!\n"); // print the complete msg
                         fout.flush(); // flush the file output stream
                         fout.close(); // close the file output stream
-                    } else {
+                    } else if (receive.contains("System:")) {
                         System.out.println(receive);
                     }
                 }
