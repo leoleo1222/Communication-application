@@ -89,7 +89,33 @@ public class Server {
                 for (String username : socketList.keySet()) {
                     if (new File(username + ".txt").exists() && socketList.containsKey(username)) {
                         String offline_msg = get_offline_data(new File(username + ".txt"));
-                        forward(offline_msg, username, "offline");
+                        // split the offline_msg with \n
+                        String[] offline_msg_list = offline_msg.split("\n");
+                        for (String msg : offline_msg_list) {
+                            // get the msg, the msg is after the ":"
+                            String messageDetail = msg.substring(msg.indexOf(":") + 2);
+                            if (messageDetail.startsWith("!file")) {
+                                forward(messageDetail, username, "offline"); // forward the msg to the target
+                                File file = new File(username + "/" + messageDetail.substring(6));
+                                FileInputStream fin = new FileInputStream(file); // create a file input stream
+                                byte[] filename = file.getName().getBytes(); // get the file name
+                                out.writeInt(filename.length); // send the file name length to the server
+                                out.write(filename, 0, filename.length); // send the file name to the server
+                                long fsize = file.length(); // get the file fsize
+                                out.writeLong(fsize); // send the file fsize to the server
+                                System.out.printf("Uploading %s (%d bytes)", messageDetail.substring(6), fsize);
+                                while (fsize > 0) {
+                                    int len = fin.read(buffer, 0, (int) Math.min(fsize, buffer.length));
+                                    out.write(buffer, 0, len); // send the file to the server
+                                    fsize -= len; // update the file size
+                                    System.out.printf("."); // print out a dot
+                                }
+                                System.out.println("Complete!"); // print out complete
+                                out.flush(); // flush the output stream
+                                fin.close();
+                            } else
+                                forward(offline_msg, username, "offline");
+                        }
                         if (new File(username + ".txt").delete())
                             System.out.println("Deleted " + username + "'s offline data file");
                         else
@@ -216,8 +242,12 @@ public class Server {
                     if (group.containsKey(group_name)) {
                         String msg = "Group->(" + group_name + ")";
                         msg += receiveString(in);
+                        // the sender name is between ) and :
+                        String sender = msg.substring(msg.indexOf(")") + 1, msg.indexOf(":"));
                         for (String member : group.get(group_name)) {
-                            forward(msg, member, "group");
+                            if (!member.equals(sender)) {
+                                forward(msg, member, "single");
+                            }
                         }
                     } else {
                         sendString("System: " + "Group " + group_name + " does not exist", out);
