@@ -1,3 +1,4 @@
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -16,18 +17,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class gui2 extends Application {
     //private static Client client;
     ObservableList<Node> children;
     ObservableList<Node> listChildren;
 
-    String[] header = {"reg", "single", "group", "showList", "exit"};
+    String[] header = { "reg", "single", "group", "showList", "upload", "download", "exit" };
     private String[][] dmList = new String[0][0];
     private String[][] groupList = new String[0][0];
     public String receiver;
@@ -55,7 +54,7 @@ public class gui2 extends Application {
     @FXML
     private Label receiverName;
 
-    public String username, password;
+    public String username, password, filename;
     public static DataOutputStream out;
     public static DataInputStream in;
     public byte[] buffer = new byte[1024];
@@ -87,12 +86,12 @@ public class gui2 extends Application {
                         r_size -= len;
                     }
 
-                    if(swapMode.getText().equals("Individual")){
-                        if(receive.startsWith("System")){ listIndividual(receive);
-                        }else receive(receive.replaceAll("Single->", ""));
-                    }else{
-                        if(receive.startsWith("System")){ listGroup(receive);
-                        }else receive(receive.replaceAll("Group->", ""));
+                    if(receive.startsWith("System: ")) {
+                        if(swapMode.getText().equals("Individual")) listIndividual(receive);
+                        else if(swapMode.getText().equals("Group")) listGroup(receive);
+                    }
+                    else {
+                        receive(receive);
                     }
 
                     System.out.println(receive);
@@ -105,10 +104,97 @@ public class gui2 extends Application {
         t.start();
     }
 
-    public void receive(String receive) {
+    public void receive(String receive){
         Platform.runLater(() -> {
-            children.add(messageNode(receive, false));
+            if(receive.contains("download")) {
+                try {
+                    download(receive);
+                    return;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if(receive.startsWith("Single")) {
+                receiveDm(receive.substring(8));
+            }
+            else if(receive.startsWith("Group")) {
+                receiveGroup(receive.substring(7));
+            }
         });
+    }
+
+    private void download(String receive) throws IOException {
+        System.out.println("download");
+        if(new File(username + "_download").mkdir()){
+            int remain = in.readInt(); // the size of the file
+            String filename = ""; // the name of the file
+            while (remain > 0) { // receive the file name
+                int len = in.read(buffer, 0, Math.min(remain, buffer.length)); // read the file name
+                filename += new String(buffer, 0, len); // append the file name
+                remain -= len; // update the remain size
+            }
+            // create a file with the name inside the sender folder
+            File file = new File(username + "_download" + "/" + filename);
+            FileOutputStream fout = new FileOutputStream(file); // create a file output stream
+            long size = in.readLong(); // read the file size
+            System.out.printf("Downloading %s (%d bytes) ...\n", filename, size); // print the file name and size
+            while (size > 0) { // receive the file
+                int len = in.read(buffer, 0, (int) Math.min(size, buffer.length)); // read the file
+                fout.write(buffer, 0, len); // write the file
+                size -= len; // update the remain size
+                System.out.printf("."); // print a dot to show the progress
+            }
+            System.out.printf("Completed!\n"); // print the complete msg
+            fout.flush(); // flush the file output stream
+            fout.close(); // close the file output stream
+        }
+    }
+
+    private void receiveDm(String receive) {
+        String[] message = receive.split(":", 2);
+        String sender = message[0];
+        if (sender.equals(receiver)) children.add(messageNode(message[1], false));
+        for (int i = 0; i < dmList.length; i++) {
+            if (dmList[i][0].equals(sender)) {
+                addDm(i, message[1]);
+                return;
+            }
+        }
+        addToList(sender);
+        addDm(dmList.length-1, message[1]);
+    }
+
+    private void addDm(int person, String message) {
+        String[] messages = new String[dmList[person].length + 1];
+        for (int i = 0; i < dmList[person].length; i++) {
+            messages[i] = dmList[person][i];
+        }
+        messages[dmList[person].length] = message;
+        dmList[person] = messages;
+    }
+
+    private void receiveGroup(String receive) {
+        String[] message = receive.split(":", 2);
+        String sender = message[0];
+        if (sender.equals(receiver)) children.add(messageNode(message[1], false));
+        for (int i = 0; i < groupList.length; i++) {
+            if (groupList[i][0].equals(sender)) {
+                addGroupDm(i, message[1]);
+                return;
+            }
+        }
+        addToGroupList(sender);
+        addGroupDm(groupList.length-1,message[1]);
+    }
+
+    private void addGroupDm(int group, String message) {
+        String[] messages = new String[groupList[group].length + 1];
+        for (int i = 0; i < groupList[group].length; i++) {
+            messages[i] = groupList[group][i];
+        }
+        messages[groupList[group].length] = message;
+        groupList[group] = messages;
     }
 
 
@@ -126,8 +212,10 @@ public class gui2 extends Application {
         });
 
         txtInput.setOnKeyPressed(event -> {
-            if (event.getCode().toString().equals("ENTER"))
-                sendMessage();
+            if (event.getCode().toString().equals("ENTER")) {
+                if (swapMode.getText().equals("Individual")) sendMessage();
+                else if (swapMode.getText().equals("Group")) sendGroupMessage();
+            }
         });
 
         swapMode.setOnMouseClicked(event -> {
@@ -161,7 +249,19 @@ public class gui2 extends Application {
         });
 
         upload.setOnMouseClicked(event -> {
-            sendMessage();
+            if(swapMode.getText().equals("Individual")) {
+                filename = txtInput.getText();
+                File file = new File(filename);
+                if(file.exists()) {
+                    sendString("upload",out);
+                    sendString(username,out);
+                    uploadFile(filename);
+                    txtInput.clear();
+                }else{
+                    txtInput.setText("File Not Found!");
+                    sendMessage();
+                }
+            }
         });
 
         try {
@@ -205,12 +305,34 @@ public class gui2 extends Application {
         Platform.runLater(() -> {
             String text = txtInput.getText();
             txtInput.clear();
-            children.add(messageNode(text, true));
-            sendString(header[1] , out);
-            sendString(receiver, out);
-            sendString(text, out);
+            if (text.contains("!file:")) {
+                sendString(header[4] , out);
+                sendString(receiver, out);
+                sendString(username, out);
+                String path = text.substring(6);
+                uploadFile(path);
+            }
+            else {
+                children.add(messageNode(text, true));
+                sendString(header[1] , out);
+                sendString(receiver, out);
+                sendString(username+":"+ text, out);
+            }
 
-            System.out.println(receiver + "," + text);
+
+        });
+    }
+
+    private void sendGroupMessage() {
+        Platform.runLater(() -> {
+            String text = txtInput.getText();
+            txtInput.clear();
+            children.add(messageNode(text, true));
+            sendString(header[2] , out);
+            sendString("send", out);
+            sendString(receiver, out);
+            if (text.contains("!file:")) sendString(text, out);
+            else sendString(username+":"+ text, out);
         });
     }
 
@@ -223,20 +345,38 @@ public class gui2 extends Application {
             // Add list
             if (swapMode.getText().equals("Group")) {
                 swapMode.setText("Individual");
-                //for (int i = 0; ;i++);  //listChildren.add(ind[i]);
-
+                restoreList();
             }
             else {
                 swapMode.setText("Group");
-                //for (int i = 0; ;i++);  //listChildren.add(grp[i]);
-
+                restoreGroupList();
             }
         });
     }
 
-    private void uploadFile() {
+    private void uploadFile(String path) {
         Platform.runLater(() -> {
-
+            try {
+                File file = new File(path); // create a file object
+                FileInputStream fin = new FileInputStream(file); // create a file input stream
+                byte[] fileName = file.getName().getBytes(); // get the file name
+                out.writeInt(fileName.length); // send the file name length to the server
+                out.write(fileName, 0, fileName.length); // send the file name to the server
+                long size = file.length(); // get the file size
+                out.writeLong(size); // send the file size to the server
+                System.out.printf("Uploading %s (%d bytes)", path, size); // print out the file name and size
+                while (size > 0) {
+                    int len = fin.read(buffer, 0, (int) Math.min(size, buffer.length)); // read the file
+                    out.write(buffer, 0, len); // send the file to the server
+                    size -= len; // update the file size
+                    System.out.printf("."); // print out a dot
+                }
+                System.out.println("Complete!"); // print out complete
+                out.flush(); // flush the output stream
+                fin.close();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
         });
     }
 
@@ -280,7 +420,7 @@ public class gui2 extends Application {
         Platform.runLater(() -> {
             String[] list = receive.split(",");
             listPane.getChildren().remove(1, listPane.getChildren().size());
-            for (int i = 1; i < list.length; i++) addBox(list[i]);
+            for (int i = 1; i < list.length; i++) addGroupBox(list[i]);
         });
     }
 
@@ -292,6 +432,18 @@ public class gui2 extends Application {
         box.getChildren().add(label);
         box.setOnMouseClicked(event -> {
             addToList(name);
+        });
+        listPane.getChildren().add(box);
+    }
+
+    private void addGroupBox(String name) {
+        HBox box = new HBox();
+        box.paddingProperty().setValue(new Insets(5, 10, 0, 5));
+        javafx.scene.control.Label label = new Label(name);
+        label.setWrapText(true);
+        box.getChildren().add(label);
+        box.setOnMouseClicked(event -> {
+            addToGroupList(name);
         });
         listPane.getChildren().add(box);
     }
@@ -311,32 +463,79 @@ public class gui2 extends Application {
         }
         newDmList[dmList.length][0] = individual;
         dmList = newDmList;
-        restoreList();
+        if (swapMode.getText().equals("Individual")) restoreList();
+    }
+
+    private void addToGroupList(String individual) {
+        String[][] newDmList = new String[groupList.length+1][1];
+        for (int i = 0; i < groupList.length; i++) {
+            newDmList[i] = new String[groupList[i].length];
+            if (groupList[i][0].equals(individual)) {
+                System.out.println("duplicated group");
+                restoreGroupList();
+                return;
+            }
+            for (int j = 0; j < groupList[i].length; j++) {
+                newDmList[i][j] = groupList[i][j];
+            }
+        }
+        newDmList[groupList.length][0] = individual;
+        groupList = newDmList;
+        if (swapMode.getText().equals("Group")) restoreGroupList();
     }
 
     private void restoreList() {
         listPane.getChildren().remove(1, listPane.getChildren().size());
-        for (int i = 0; i < dmList.length; i++) dmBox(dmList[i]);
+        for (int i = 0; i < dmList.length; i++) dmBox(i);
     }
 
-    private void dmBox(String[] individual) {
+    private void restoreGroupList() {
+        listPane.getChildren().remove(1, listPane.getChildren().size());
+        for (int i = 0; i < groupList.length; i++) groupBox(i);
+    }
+
+    private void dmBox(int individual) {
         HBox box = new HBox();
         box.paddingProperty().setValue(new Insets(5, 10, 0, 5));
-        javafx.scene.control.Label label = new Label(individual[0]);
+        javafx.scene.control.Label label = new Label(dmList[individual][0]);
         label.setWrapText(true);
         box.getChildren().add(label);
         box.setOnMouseClicked(event -> {
             changeDm(individual);
-            receiver = individual[0];
+            receiver = dmList[individual][0];
             receiverName.setText(receiver);
-            System.out.println(receiver);
         });
         listPane.getChildren().add(box);
     }
 
-    private void changeDm(String[] dms) {
+    private void groupBox(int group) {
+        HBox box = new HBox();
+        box.paddingProperty().setValue(new Insets(5, 10, 0, 5));
+        javafx.scene.control.Label label = new Label(groupList[group][0]);
+        label.setWrapText(true);
+        box.getChildren().add(label);
+        box.setOnMouseClicked(event -> {
+            changeGroup(group);
+            receiver = groupList[group][0];
+            receiverName.setText(receiver);
+        });
+        listPane.getChildren().add(box);
+    }
+
+    private void changeDm(int dms) {
         children.clear();
-        for(int i = 1; i < dms.length; i++) children.add(messageNode(dms[i], false));
+        System.out.println(dmList[dms][0]);
+        System.out.println(dmList[dms].length);
+        for(int i = 1; i < dmList[dms].length; i++) {
+            children.add(messageNode(dmList[dms][i], false));
+        }
+    }
+
+    private void changeGroup(int dms) {
+        children.clear();
+        System.out.println(groupList[dms][0]);
+        System.out.println(groupList[dms].length);
+        for(int i = 1; i < groupList[dms].length; i++) children.add(messageNode(groupList[dms][i], false));
     }
 
     public static void main(String[] args) throws IOException {

@@ -74,7 +74,6 @@ public class createGroup extends Application {
 
         in = gui.in;
         out = gui.out;
-        System.out.println(out.toString());
         done.setOnMouseClicked(event -> {
             sendString("!end",out);
             stage.close();
