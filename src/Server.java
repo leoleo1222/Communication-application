@@ -213,7 +213,7 @@ public class Server {
             if (type.equals("upload")) { // exit the server
                 // get the sender name
                 String sender = receiveString(in); // sender
-                new File("/" + sender).mkdir(); // create a folder for the sender
+                if(new File(sender).mkdir()) System.out.println("Created " + sender + " dir");
                 int remain = in.readInt(); // the size of the file
                 String filename = ""; // the name of the file
                 while (remain > 0) { // receive the file name
@@ -222,7 +222,7 @@ public class Server {
                     remain -= len; // update the remain size
                 } 
                 // create a file with the name inside the sender folder
-                File file = new File("/" + sender + "/" + filename);
+                File file = new File( sender + "/" + filename);
                 FileOutputStream fout = new FileOutputStream(file); // create a file output stream
                 long size = in.readLong(); // read the file size
                 System.out.printf("Downloading %s (%d bytes) ...\n", filename, size); // print the file name and size
