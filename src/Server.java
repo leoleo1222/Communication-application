@@ -131,10 +131,36 @@ public class Server {
                     }
                     size -= len;
                 }
-
+                // get the username, the username is between "Single->" and ":"
+                String username = msg.substring(8, msg.indexOf(":"));
+                // get the msg, the msg is after the ":"
+                String messageDetail = msg.substring(msg.indexOf(":") + 2);
+                // if the messageDetail start with !file then it is a file transfer
+                // the format is !file:filename
+                if (messageDetail.startsWith("!file")) {
+                    forward("download", target, type); // forward the msg to the target
+                    File file = new File(username + "/" + messageDetail.substring(6));
+                    FileInputStream fin = new FileInputStream(file); // create a file input stream
+                    byte[] filename = file.getName().getBytes(); // get the file name
+                    out.writeInt(filename.length); // send the file name length to the server
+                    out.write(filename, 0, filename.length); // send the file name to the server
+                    long fsize = file.length(); // get the file fsize
+                    out.writeLong(fsize); // send the file fsize to the server
+                    System.out.printf("Uploading %s (%d bytes)", messageDetail.substring(6), fsize); // print out the
+                                                                                                     // file name and
+                                                                                                     // fsize
+                    while (fsize > 0) {
+                        int len = fin.read(buffer, 0, (int) Math.min(fsize, buffer.length)); // read the file
+                        out.write(buffer, 0, len); // send the file to the server
+                        fsize -= len; // update the file size
+                        System.out.printf("."); // print out a dot
+                    }
+                    System.out.println("Complete!"); // print out complete
+                    out.flush(); // flush the output stream
+                    fin.close();
+                }
                 if (socketList.containsKey(target)) {
-                    // forward(name_list.toString(), target, "System msg");
-                    forward(msg.toString(), target, type);
+                    forward(msg.toString(), target, type); // forward the msg to the target
                 } else {
                     // This is a debug msg, it will show when the receiver is offline
                     if (account.containsKey(target))
@@ -213,16 +239,17 @@ public class Server {
             if (type.equals("upload")) { // exit the server
                 // get the sender name
                 String sender = receiveString(in); // sender
-                if(new File(sender).mkdir()) System.out.println("Created " + sender + " dir");
+                if (new File(sender).mkdir())
+                    System.out.println("Created " + sender + " dir");
                 int remain = in.readInt(); // the size of the file
                 String filename = ""; // the name of the file
                 while (remain > 0) { // receive the file name
                     int len = in.read(buffer, 0, Math.min(remain, buffer.length)); // read the file name
                     filename += new String(buffer, 0, len); // append the file name
                     remain -= len; // update the remain size
-                } 
+                }
                 // create a file with the name inside the sender folder
-                File file = new File( sender + "/" + filename);
+                File file = new File(sender + "/" + filename);
                 FileOutputStream fout = new FileOutputStream(file); // create a file output stream
                 long size = in.readLong(); // read the file size
                 System.out.printf("Downloading %s (%d bytes) ...\n", filename, size); // print the file name and size

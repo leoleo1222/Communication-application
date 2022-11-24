@@ -2,6 +2,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
@@ -75,8 +76,34 @@ public class Client2 {
                             q.add(receive);
                             groupMsg.put(group, q);
                         }
-                    } else
+                    } else if (receive.contains("download")) {
+                        if (new File(username + "_download").mkdir())
+                            System.out.println("Created " + username + " dir");
+                        int remain = in.readInt(); // the size of the file
+                        String filename = ""; // the name of the file
+                        while (remain > 0) { // receive the file name
+                            int len = in.read(buffer, 0, Math.min(remain, buffer.length)); // read the file name
+                            filename += new String(buffer, 0, len); // append the file name
+                            remain -= len; // update the remain size
+                        }
+                        // create a file with the name inside the username folder
+                        File file = new File(username + "_download" + "/" + filename);
+                        FileOutputStream fout = new FileOutputStream(file); // create a file output stream
+                        long size = in.readLong(); // read the file size
+                        System.out.printf("Downloading %s (%d bytes) ...\n", filename, size); // print the file name and
+                                                                                              // size
+                        while (size > 0) { // receive the file
+                            int len = in.read(buffer, 0, (int) Math.min(size, buffer.length)); // read the file
+                            fout.write(buffer, 0, len); // write the file
+                            size -= len; // update the remain size
+                            System.out.printf("."); // print a dot to show the progress
+                        }
+                        System.out.printf("Completed!\n"); // print the complete msg
+                        fout.flush(); // flush the file output stream
+                        fout.close(); // close the file output stream
+                    } else {
                         System.out.println(receive);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -198,22 +225,23 @@ public class Client2 {
                 System.out.printf("Input the file path:\n");
                 String filepath = sc.nextLine(); // get the file path
                 File file = new File(filepath); // create a file object
-                if (!file.exists() && file.isDirectory()) throw new IOException("Invalid path!"); // check if the file exists
+                if (!file.exists() && file.isDirectory())
+                    throw new IOException("Invalid path!"); // check if the file exists
                 FileInputStream fin = new FileInputStream(file); // create a file input stream
                 byte[] filename = file.getName().getBytes(); // get the file name
-                out.writeInt(filename.length);  // send the file name length to the server
+                out.writeInt(filename.length); // send the file name length to the server
                 out.write(filename, 0, filename.length); // send the file name to the server
-                long size = file.length();  // get the file size
-                out.writeLong(size);    // send the file size to the server
-                System.out.printf("Uploading %s (%d bytes)", filepath, size);   // print out the file name and size
+                long size = file.length(); // get the file size
+                out.writeLong(size); // send the file size to the server
+                System.out.printf("Uploading %s (%d bytes)", filepath, size); // print out the file name and size
                 while (size > 0) {
                     int len = fin.read(buffer, 0, (int) Math.min(size, buffer.length)); // read the file
-                    out.write(buffer, 0, len);  // send the file to the server
-                    size -= len;    // update the file size
+                    out.write(buffer, 0, len); // send the file to the server
+                    size -= len; // update the file size
                     System.out.printf("."); // print out a dot
                 }
-                System.out.println("Complete!");    // print out complete
-                out.flush();    // flush the output stream
+                System.out.println("Complete!"); // print out complete
+                out.flush(); // flush the output stream
                 fin.close();
             } else if (choice == 7) {
                 System.out.println("Program terminated");
