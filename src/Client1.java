@@ -10,13 +10,13 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
-public class Client3 {
+public class Client1 {
     public static String username = " "; // the username of the user
     private static String password = " "; // the password of the user
     private static HashMap<String, Queue<String>> singleMsg = new HashMap<>(); // the single msg
     private static HashMap<String, Queue<String>> groupMsg = new HashMap<>(); // the group msg
 
-    public Client3(String serverIP, int port) throws IOException {
+    public Client1(String serverIP, int port) throws IOException {
         System.out.printf("Connecting to %s:%d\n", serverIP, port);
         Socket socket = new Socket(serverIP, port);
         DataInputStream in = new DataInputStream(socket.getInputStream());
@@ -85,8 +85,6 @@ public class Client3 {
                             filename += new String(buffer, 0, len); // append the file name
                             remain -= len; // update the remain size
                         }
-                        // the file name is after !file:
-                        filename = filename.substring(filename.indexOf("!file:") + 6);
                         // create a file with the name inside the username folder
                         File file = new File(username + "_download" + "/" + filename);
                         FileOutputStream fout = new FileOutputStream(file); // create a file output stream
@@ -284,7 +282,7 @@ public class Client3 {
         String serverIP = "127.0.0.1";
         int port = 12345;
         try {
-            new Client3(serverIP, port);
+            new Client1(serverIP, port);
         } catch (Exception e) {
             e.printStackTrace();
         }

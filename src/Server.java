@@ -91,18 +91,23 @@ public class Server {
                     if (new File(username + ".txt").exists() && socketList.containsKey(username)) {
                         String[] offline_msg = get_offline_data(new File(username + ".txt"));
                         for (String msg : offline_msg) {
+                            String n = msg.substring(8, msg.indexOf(":"));
+                            System.out.println("name: "+n + ", ");
                             // get the msg, the msg is after the ":"
                             String messageDetail = msg.substring(msg.indexOf(":") + 2);
+                            System.out.println("msg: "+messageDetail);
                             if (messageDetail.startsWith("!file")) {
-                                forward(messageDetail, username, "offline"); // forward the msg to the target
-                                File file = new File(username + "/" + messageDetail.substring(6));
+                                String fname = messageDetail.substring(messageDetail.indexOf("!file:") + 6);
+                                System.out.println("fname: "+fname);
+                                forward("download", username, "offline"); // forward the msg to the target
+                                File file = new File(n + "/" + fname);
                                 FileInputStream fin = new FileInputStream(file); // create a file input stream
                                 byte[] filename = file.getName().getBytes(); // get the file name
                                 out.writeInt(filename.length); // send the file name length to the server
                                 out.write(filename, 0, filename.length); // send the file name to the server
                                 long fsize = file.length(); // get the file fsize
                                 out.writeLong(fsize); // send the file fsize to the server
-                                System.out.printf("Uploading %s (%d bytes)", messageDetail.substring(6), fsize);
+                                System.out.printf("Uploading %s (%d bytes)", fname, fsize);
                                 while (fsize > 0) {
                                     int len = fin.read(buffer, 0, (int) Math.min(fsize, buffer.length));
                                     out.write(buffer, 0, len); // send the file to the server
@@ -164,7 +169,7 @@ public class Server {
                 String messageDetail = msg.substring(msg.indexOf(":") + 2);
                 // if the messageDetail start with !file then it is a file transfer
                 // the format is !file:filename
-                if (messageDetail.startsWith("!file")) {
+                if (messageDetail.startsWith("!file") && socketList.containsKey(target)) {
                     forward("download", target, type); // forward the msg to the target
                     File file = new File(username + "/" + messageDetail.substring(6));
                     FileInputStream fin = new FileInputStream(file); // create a file input stream
@@ -241,12 +246,16 @@ public class Server {
                 if (action.equals("send")) { // send msg to a group
                     String group_name = receiveString(in);
                     if (group.containsKey(group_name)) {
-                        String msg = "Group->(" + group_name + ")";
+                        String msg = "Group->" + group_name + ":";
                         msg += receiveString(in);
                         // the sender name is between ) and :
                         String sender = msg.substring(msg.indexOf(")") + 1, msg.indexOf(":"));
                         for (String member : group.get(group_name)) {
-                            if (!member.equals(sender)) {
+                            if (!socketList.containsKey(member) && account.containsKey(member)) { // if member offline
+                                FileWriter fw = new FileWriter(member + ".txt", true);
+                                fw.append(msg+"\n");
+                                fw.close();
+                            } else if (!member.equals(sender)) {
                                 forward(msg, member, "single");
                             }
                         }
