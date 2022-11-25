@@ -246,7 +246,7 @@ public class Server {
                 if (action.equals("send")) { // send msg to a group
                     String group_name = receiveString(in);
                     if (group.containsKey(group_name)) {
-                        String msg = "Group->" + group_name + ":";
+                        String msg = "Group->(" + group_name + "):";
                         msg += receiveString(in);
                         // the sender name is between ) and :
                         String sender = msg.substring(msg.indexOf(")") + 1, msg.indexOf(":"));
