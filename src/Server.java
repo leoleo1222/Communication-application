@@ -98,10 +98,9 @@ public class Server {
                         for (String msg : offline_msg) {
                             // get the msg, the msg is after the ":"
                             String messageDetail = msg.substring(msg.indexOf(":") + 2);
-                            if (messageDetail.startsWith("!req")) {
+                            if (messageDetail.startsWith("!file")) {
                                 forward(messageDetail, username, "offline"); // forward the msg to the target
-                                String fn = messageDetail.substring(6);
-                                File file = new File(username + "/" + fn);
+                                File file = new File(username + "/" + messageDetail.substring(6));
                                 FileInputStream fin = new FileInputStream(file); // create a file input stream
                                 byte[] filename = file.getName().getBytes(); // get the file name
                                 out.writeInt(filename.length); // send the file name length to the server
@@ -172,11 +171,9 @@ public class Server {
                 System.out.println("messageDetail->" + messageDetail);
                 // if the messageDetail start with !file then it is a file transfer
                 // the format is !file:filename
-                if (messageDetail.startsWith("!req")) {
+                if (messageDetail.startsWith("!file")) {
                     forward("download", target, type); // forward the msg to the target
-                    // get the filename after !req
-                    String fn = messageDetail.substring(6);
-                    File file = new File(username + "/" + fn);
+                    File file = new File(username + "/" + messageDetail.substring(6));
                     FileInputStream fin = new FileInputStream(file); // create a file input stream
                     byte[] filename = file.getName().getBytes(); // get the file name
                     out.writeInt(filename.length); // send the file name length to the server
@@ -256,12 +253,11 @@ public class Server {
                         // the sender name is between ) and :
                         String sender = msg.substring(msg.indexOf(")") + 1, msg.indexOf(":"));
                         for (String member : group.get(group_name)) {
-                            if (!socketList.containsKey(member) && account.containsKey(member)) {
+                            if (!socketList.containsKey(member) && account.containsKey(member)) { // if member offline
                                 FileWriter fw = new FileWriter(member+".txt", true);
                                 fw.append(member);
                                 fw.close();
-                            }
-                            if (!member.equals(sender)) {
+                            }else if(!member.equals(sender)) {
                                 forward(msg, member, "single");
                             }
                         }
