@@ -98,9 +98,10 @@ public class Server {
                         for (String msg : offline_msg) {
                             // get the msg, the msg is after the ":"
                             String messageDetail = msg.substring(msg.indexOf(":") + 2);
-                            if (messageDetail.startsWith("!file")) {
+                            if (messageDetail.startsWith("!req")) {
                                 forward(messageDetail, username, "offline"); // forward the msg to the target
-                                File file = new File(username + "/" + messageDetail.substring(6));
+                                String fn = messageDetail.substring(6);
+                                File file = new File(username + "/" + fn);
                                 FileInputStream fin = new FileInputStream(file); // create a file input stream
                                 byte[] filename = file.getName().getBytes(); // get the file name
                                 out.writeInt(filename.length); // send the file name length to the server
@@ -171,9 +172,11 @@ public class Server {
                 System.out.println("messageDetail->" + messageDetail);
                 // if the messageDetail start with !file then it is a file transfer
                 // the format is !file:filename
-                if (messageDetail.startsWith("!file")) {
+                if (messageDetail.startsWith("!req")) {
                     forward("download", target, type); // forward the msg to the target
-                    File file = new File(username + "/" + messageDetail.substring(6));
+                    // get the filename after !req
+                    String fn = messageDetail.substring(6);
+                    File file = new File(username + "/" + fn);
                     FileInputStream fin = new FileInputStream(file); // create a file input stream
                     byte[] filename = file.getName().getBytes(); // get the file name
                     out.writeInt(filename.length); // send the file name length to the server
