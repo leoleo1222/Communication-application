@@ -171,28 +171,28 @@ public class Server {
                 System.out.println("messageDetail->" + messageDetail);
                 // if the messageDetail start with !file then it is a file transfer
                 // the format is !file:filename
-//                if (messageDetail.startsWith("!file")) {
-//                    forward("download", target, type); // forward the msg to the target
-//                    File file = new File(username + "/" + messageDetail.substring(6));
-//                    FileInputStream fin = new FileInputStream(file); // create a file input stream
-//                    byte[] filename = file.getName().getBytes(); // get the file name
-//                    out.writeInt(filename.length); // send the file name length to the server
-//                    out.write(filename, 0, filename.length); // send the file name to the server
-//                    long fsize = file.length(); // get the file fsize
-//                    out.writeLong(fsize); // send the file fsize to the server
-//                    System.out.printf("Uploading %s (%d bytes)", messageDetail.substring(6), fsize); // print out the
-//                    // file name and
-//                    // fsize
-//                    while (fsize > 0) {
-//                        int len = fin.read(buffer, 0, (int) Math.min(fsize, buffer.length)); // read the file
-//                        out.write(buffer, 0, len); // send the file to the server
-//                        fsize -= len; // update the file size
-//                        System.out.printf("."); // print out a dot
-//                    }
-//                    System.out.println("Complete!"); // print out complete
-//                    out.flush(); // flush the output stream
-//                    fin.close();
-//                }
+                if (messageDetail.startsWith("!file")) {
+                    forward("download", target, type); // forward the msg to the target
+                    File file = new File(username + "/" + messageDetail.substring(6));
+                    FileInputStream fin = new FileInputStream(file); // create a file input stream
+                    byte[] filename = file.getName().getBytes(); // get the file name
+                    out.writeInt(filename.length); // send the file name length to the server
+                    out.write(filename, 0, filename.length); // send the file name to the server
+                    long fsize = file.length(); // get the file fsize
+                    out.writeLong(fsize); // send the file fsize to the server
+                    System.out.printf("Uploading %s (%d bytes)", messageDetail.substring(6), fsize); // print out the
+                    // file name and
+                    // fsize
+                    while (fsize > 0) {
+                        int len = fin.read(buffer, 0, (int) Math.min(fsize, buffer.length)); // read the file
+                        out.write(buffer, 0, len); // send the file to the server
+                        fsize -= len; // update the file size
+                        System.out.printf("."); // print out a dot
+                    }
+                    System.out.println("Complete!"); // print out complete
+                    out.flush(); // flush the output stream
+                    fin.close();
+                }
                 if (socketList.containsKey(target)) {
                     forward(msg.toString(), target, type); // forward the msg to the target
                 } else {
@@ -281,7 +281,7 @@ public class Server {
             }
             if (type.equals("upload")) { // exit the server
                 // get the sender name
-                String target = receiveString(in); // target
+//                String target = receiveString(in); // target
                 String sender = receiveString(in); // sender
                 if (new File(sender).mkdir())
                     System.out.println("Created " + sender + " dir");
@@ -304,8 +304,8 @@ public class Server {
                     System.out.printf("."); // print a dot to show the progress
                 }
                 System.out.printf("Completed!\n"); // print the complete msg
-                forward("download", target, "file transfer");
-                upload(file, out);
+//                forward("download", target, "file transfer");
+//                upload(file, out);
                 fout.flush(); // flush the file output stream
                 fout.close(); // close the file output stream
             }
