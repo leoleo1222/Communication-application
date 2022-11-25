@@ -117,8 +117,7 @@ public class Server {
                                 System.out.println("Complete!"); // print out complete
                                 out.flush(); // flush the output stream
                                 fin.close();
-                            }
-                            else
+                            } else
                                 forward(msg, username, "offline");
                         }
                         if (new File(username + ".txt").delete())

@@ -5,7 +5,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
 
 public class Client1 {
     public static String username = " "; // the username of the user
@@ -112,10 +115,6 @@ public class Client1 {
             int choice = sc.nextInt();
             sc.nextLine();
             if (choice == 1) {
-                TimeZone.setDefault(TimeZone.getTimeZone("Asia/Hong_Kong"));
-                long timestamp = System.currentTimeMillis();
-                Date date = new Date(timestamp);
-                String datetime = date.toString();
                 sendString(header[1], out);
                 System.out.println("Enter a receiver name:");
                 String receiver = sc.nextLine();
@@ -123,7 +122,6 @@ public class Client1 {
                 System.out.println("Input message and press ENTER");
                 String message = username + ": ";
                 message += sc.nextLine();
-                message += " (" + datetime + ")";
                 sendString(message, out);
             } else if (choice == 2) {
                 // create a group with member, the client will send out the member list to the
