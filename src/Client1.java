@@ -85,7 +85,9 @@ public class Client1 {
                             filename += new String(buffer, 0, len); // append the file name
                             remain -= len; // update the remain size
                         }
-                        filename = filename.substring(filename.indexOf("!file:") + 6);
+                        if(filename.contains("!file:")){
+                            filename = filename.substring(filename.indexOf("!file:") + 6);
+                        }
                         // create a file with the name inside the username folder
                         File file = new File(username + "_download" + "/" + filename);
                         FileOutputStream fout = new FileOutputStream(file); // create a file output stream
