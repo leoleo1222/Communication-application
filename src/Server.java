@@ -21,11 +21,11 @@ public class Server {
 
     public Server(int port) throws IOException {
         ServerSocket srvSocket = new ServerSocket(port);
-        // create 3 accounts & 1 group at the beginning for testing
-        account.put("leo", "leo");
-        account.put("jason", "jason");
-        account.put("sam", "sam");
-        group.put("default", new ArrayList<>());
+        //create 3 accounts & 1 group at the beginning for testing
+        account.put("leo","leo");
+        account.put("jason","jason");
+        account.put("sam","sam");
+        group.put("default",new ArrayList<>());
 
         while (true) {
             print("Listening at port %d...\n", port);
@@ -98,7 +98,7 @@ public class Server {
                         for (String msg : offline_msg) {
                             // get the msg, the msg is after the ":"
                             String messageDetail = msg.substring(msg.indexOf(":") + 2);
-                            if (messageDetail.startsWith("!file") || messageDetail.startsWith("!req")) {
+                            if (messageDetail.startsWith("!file")) {
                                 forward(messageDetail, username, "offline"); // forward the msg to the target
                                 File file = new File(username + "/" + messageDetail.substring(6));
                                 FileInputStream fin = new FileInputStream(file); // create a file input stream
@@ -171,8 +171,9 @@ public class Server {
                 System.out.println("messageDetail->" + messageDetail);
                 // if the messageDetail start with !file then it is a file transfer
                 // the format is !file:filename
-                if (messageDetail.startsWith("!file") || messageDetail.startsWith("!req")) {
+                if (messageDetail.startsWith("!file")) {
                     forward("download", target, type); // forward the msg to the target
+
                     File file = new File(username + "/" + messageDetail.substring(6));
                     FileInputStream fin = new FileInputStream(file); // create a file input stream
                     byte[] filename = file.getName().getBytes(); // get the file name
@@ -254,10 +255,10 @@ public class Server {
                         String sender = msg.substring(msg.indexOf(")") + 1, msg.indexOf(":"));
                         for (String member : group.get(group_name)) {
                             if (!socketList.containsKey(member) && account.containsKey(member)) { // if member offline
-                                FileWriter fw = new FileWriter(member + ".txt", true);
-                                fw.append(member);
+                                FileWriter fw = new FileWriter(member+".txt", true);
+                                fw.append(msg + "\n");
                                 fw.close();
-                            } else if (!member.equals(sender)) {
+                            }else if(!member.equals(sender)) {
                                 forward(msg, member, "single");
                             }
                         }
@@ -280,7 +281,7 @@ public class Server {
             }
             if (type.equals("upload")) { // exit the server
                 // get the sender name
-                // String target = receiveString(in); // target
+//                String target = receiveString(in); // target
                 String sender = receiveString(in); // sender
                 if (new File(sender).mkdir())
                     System.out.println("Created " + sender + " dir");
@@ -303,15 +304,15 @@ public class Server {
                     System.out.printf("."); // print a dot to show the progress
                 }
                 System.out.printf("Completed!\n"); // print the complete msg
-                // forward("download", target, "file transfer");
-                // upload(file, out);
+//                forward("download", target, "file transfer");
+//                upload(file, out);
                 fout.flush(); // flush the file output stream
                 fout.close(); // close the file output stream
             }
         }
     }
 
-    private void upload(File path, DataOutputStream out) {
+    private void upload(File path, DataOutputStream out){
         try {
             byte[] buffer = new byte[1024];
             File file = path; // create a file object
@@ -331,7 +332,7 @@ public class Server {
             System.out.println("Complete!"); // print out complete
             out.flush(); // flush the output stream
             fin.close();
-        } catch (IOException e) {
+        } catch (IOException e){
             e.printStackTrace();
         }
     }

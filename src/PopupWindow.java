@@ -46,6 +46,7 @@ public class PopupWindow extends Application{
 
     public DataOutputStream out;
     public DataInputStream in;
+    public Socket socket;
 
     public PopupWindow() throws IOException {
         stage = new Stage();
@@ -74,7 +75,7 @@ public class PopupWindow extends Application{
 
     @FXML
     protected void initialize() throws IOException{
-        Socket socket = new Socket("127.0.0.1", 12345);
+       socket = new Socket("127.0.0.1", 12345);
 
         in = new DataInputStream(socket.getInputStream());
         out = new DataOutputStream(socket.getOutputStream());

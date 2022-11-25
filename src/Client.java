@@ -1,12 +1,14 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
-
 
 public class Client {
     public static String username = " "; // the username of the user
@@ -20,7 +22,7 @@ public class Client {
         DataInputStream in = new DataInputStream(socket.getInputStream());
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
         byte[] buffer = new byte[1024];
-        String[] header = {"reg", "single", "group", "showList", "exit"};
+        String[] header = { "reg", "single", "group", "showList", "upload", "download", "exit" };
         Scanner sc = new Scanner(System.in);
         do {
             System.out.println("Registration/Login");
@@ -45,7 +47,8 @@ public class Client {
                         receive += new String(buffer, 0, len);
                         r_size -= len;
                     }
-                    // if the received msg contain Single->, it means the msg is a single msg and add it to the singleMsg
+                    // if the received msg contain Single->, it means the msg is a single msg and
+                    // add it to the singleMsg
                     // the xxx: is the sender name
                     if (receive.contains("Single->")) {
                         String sender = receive.substring(8, receive.indexOf(":"));
@@ -59,7 +62,8 @@ public class Client {
                             singleMsg.put(sender, q);
                         }
                     }
-                    // if the received msg contain Group->, it means the msg is a group msg and add it to the groupMsg
+                    // if the received msg contain Group->, it means the msg is a group msg and add
+                    // it to the groupMsg
                     // the (xxx) is the group name
                     else if (receive.contains("Group->")) {
                         String group = receive.substring(8, receive.indexOf(")"));
@@ -72,8 +76,35 @@ public class Client {
                             q.add(receive);
                             groupMsg.put(group, q);
                         }
-                    } else
+                    } else if (receive.contains("download")) {
+                        new File(username + "_download").mkdir();
+                        int remain = in.readInt(); // the size of the file
+                        String filename = ""; // the name of the file
+                        while (remain > 0) { // receive the file name
+                            int len = in.read(buffer, 0, Math.min(remain, buffer.length)); // read the file name
+                            filename += new String(buffer, 0, len); // append the file name
+                            remain -= len; // update the remain size
+                        }
+                        // the file name is after !file:
+                        filename = filename.substring(filename.indexOf("!file:") + 6);
+                        // create a file with the name inside the username folder
+                        File file = new File(username + "_download" + "/" + filename);
+                        FileOutputStream fout = new FileOutputStream(file); // create a file output stream
+                        long size = in.readLong(); // read the file size
+                        System.out.printf("Downloading %s (%d bytes) ...\n", filename, size); // print the file name and
+                        // size
+                        while (size > 0) { // receive the file
+                            int len = in.read(buffer, 0, (int) Math.min(size, buffer.length)); // read the file
+                            fout.write(buffer, 0, len); // write the file
+                            size -= len; // update the remain size
+                            System.out.printf("."); // print a dot to show the progress
+                        }
+                        System.out.printf("Completed!\n"); // print the complete msg
+                        fout.flush(); // flush the file output stream
+                        fout.close(); // close the file output stream
+                    } else if (receive.contains("System:")) {
                         System.out.println(receive);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -81,7 +112,8 @@ public class Client {
         });
         t.start();
         while (true) { // sending msg
-            System.out.print("Type 1 to send a direct message, 2 to group function, 3 to check user list, 4 to view direct message, 5 to view group message, 6 to exit");
+            System.out.println(
+                    "Type 1 to send a direct message, 2 to group function, 3 to check user list, 4 to view direct message, 5 to view group message, 6 to upload file, 7 to exit");
             int choice = sc.nextInt();
             sc.nextLine();
             if (choice == 1) {
@@ -94,14 +126,16 @@ public class Client {
                 message += sc.nextLine();
                 sendString(message, out);
             } else if (choice == 2) {
-                // create a group with member, the client will send out the member list to the server
+                // create a group with member, the client will send out the member list to the
+                // server
                 // and the server will create a group with the member list
                 sendString(header[2], out);
                 // user can perform four operation: create/ join/ leave/ send with typing 1-4
                 // create a String array with 4 elements
-                String[] groupOperation = {"create", "join", "leave", "send", "show"};
-                System.out.print("Type 1 to create a group, 2 to join a group, 3 to leave a group, 4 to send a message, ");
-                // print type 5 to show group list
+                String[] groupOperation = { "create", "join", "leave", "send", "show" };
+                System.out.println(
+                        "Type 1 to create a group, 2 to join a group, 3 to leave a group, 4 to send a message, ");
+                // System.out.printf type 5 to show group list
                 System.out.println("Type 5 to show group list");
                 int groupChoice = sc.nextInt();
                 sc.nextLine();
@@ -117,7 +151,8 @@ public class Client {
                         System.out.println("Enter a member name: (Enter !end to end)");
                         String member = sc.nextLine();
                         sendString(member, out);
-                        if (member.equals("!end")) break;
+                        if (member.equals("!end"))
+                            break;
                     }
                 }
                 if (groupChoice == 2) { // join a group
@@ -186,9 +221,32 @@ public class Client {
                     }
                 }
             } else if (choice == 6) {
-                sendString(header[4], out);
-                break;
-
+                sendString(header[4], out); // send the header to the server
+                sendString(username, out); // send the username to the server
+                System.out.printf("Input the file path:\n");
+                String filepath = sc.nextLine(); // get the file path
+                File file = new File(filepath); // create a file object
+                if (!file.exists() && file.isDirectory())
+                    throw new IOException("Invalid path!"); // check if the file exists
+                FileInputStream fin = new FileInputStream(file); // create a file input stream
+                byte[] filename = file.getName().getBytes(); // get the file name
+                out.writeInt(filename.length); // send the file name length to the server
+                out.write(filename, 0, filename.length); // send the file name to the server
+                long size = file.length(); // get the file size
+                out.writeLong(size); // send the file size to the server
+                System.out.printf("Uploading %s (%d bytes)", filepath, size); // print out the file name and size
+                while (size > 0) {
+                    int len = fin.read(buffer, 0, (int) Math.min(size, buffer.length)); // read the file
+                    out.write(buffer, 0, len); // send the file to the server
+                    size -= len; // update the file size
+                    System.out.printf("."); // print out a dot
+                }
+                System.out.println("Complete!"); // print out complete
+                out.flush(); // flush the output stream
+                fin.close();
+            } else if (choice == 7) {
+                System.out.println("Program terminated");
+                System.exit(0);
             }
         }
     }
@@ -226,11 +284,10 @@ public class Client {
         String serverIP = "127.0.0.1";
         int port = 12345;
         try {
-            new Client2(serverIP, port);
+            new Client(serverIP, port);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
 }

@@ -18,8 +18,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.*;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class gui extends Application {
     //private static Client client;
@@ -54,9 +56,10 @@ public class gui extends Application {
     @FXML
     private Label receiverName;
 
-    public String username, password, filename;
+    public String username, password;
     public static DataOutputStream out;
     public static DataInputStream in;
+    public static Socket socket;
     public byte[] buffer = new byte[1024];
 
     public static void print(String str, Object... o) {
@@ -93,8 +96,6 @@ public class gui extends Application {
                     else {
                         receive(receive);
                     }
-
-                    System.out.println(receive);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -106,15 +107,10 @@ public class gui extends Application {
 
     public void receive(String receive){
         Platform.runLater(() -> {
-            if(receive.contains("download")) {
-                try {
-                    download(receive);
-                    return;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            if(receive.equals("download")) {
+                download();
+                return;
             }
-
             if(receive.startsWith("Single")) {
                 receiveDm(receive.substring(8));
             }
@@ -124,31 +120,45 @@ public class gui extends Application {
         });
     }
 
-    private void download(String receive) throws IOException {
-        System.out.println("download");
-        if(new File(username + "_download").mkdir()){
-            int remain = in.readInt(); // the size of the file
-            String filename = ""; // the name of the file
-            while (remain > 0) { // receive the file name
-                int len = in.read(buffer, 0, Math.min(remain, buffer.length)); // read the file name
-                filename += new String(buffer, 0, len); // append the file name
-                remain -= len; // update the remain size
+    private void download() {
+        Platform.runLater(() -> {
+            try {
+                System.out.println("download");
+                if (new File(username + "_download").mkdir());
+                System.out.println("ok");
+                int remain = in.readInt(); // the size of the file
+                System.out.println(remain);
+                String filename = ""; // the name of the file
+                System.out.println("name");
+                while (remain > 0) { // receive the file name
+                    int len = in.read(buffer, 0, Math.min(remain, buffer.length)); // read the file name
+                    filename += new String(buffer, 0, len); // append the file name
+                    remain -= len; // update the remain size
+                    System.out.println(remain);
+                }
+                System.out.println("loop");
+                // create a file with the name inside the sender folder
+                File file = new File(username + "_download" + "/" + filename);
+                System.out.println("create file");
+                FileOutputStream fout = new FileOutputStream(file); // create a file output stream
+                System.out.println("stream");
+                long size = in.readLong(); // read the file size
+                System.out.println("size");
+                System.out.printf("Downloading %s (%d bytes) ...\n", filename, size); // print the file name and size
+                while (size > 0) { // receive the file
+                    int len = in.read(buffer, 0, (int) Math.min(size, buffer.length)); // read the file
+                    fout.write(buffer, 0, len); // write the file
+                    size -= len; // update the remain size
+                    System.out.printf("."); // print a dot to show the progress
+                }
+                System.out.printf("Completed!\n"); // print the complete msg
+                fout.flush(); // flush the file output stream
+                fout.close(); // close the file output stream
             }
-            // create a file with the name inside the sender folder
-            File file = new File(username + "_download" + "/" + filename);
-            FileOutputStream fout = new FileOutputStream(file); // create a file output stream
-            long size = in.readLong(); // read the file size
-            System.out.printf("Downloading %s (%d bytes) ...\n", filename, size); // print the file name and size
-            while (size > 0) { // receive the file
-                int len = in.read(buffer, 0, (int) Math.min(size, buffer.length)); // read the file
-                fout.write(buffer, 0, len); // write the file
-                size -= len; // update the remain size
-                System.out.printf("."); // print a dot to show the progress
+            catch (IOException e){
+                e.printStackTrace();
             }
-            System.out.printf("Completed!\n"); // print the complete msg
-            fout.flush(); // flush the file output stream
-            fout.close(); // close the file output stream
-        }
+        });
     }
 
     private void receiveDm(String receive) {
@@ -249,7 +259,11 @@ public class gui extends Application {
         });
 
         upload.setOnMouseClicked(event -> {
-            if(swapMode.getText().equals("Individual")) {
+
+            if (swapMode.getText().equals("Individual")) sendFileMessage();
+            else if (swapMode.getText().equals("Group")) sendFileGroupMessage();
+
+            /*if(swapMode.getText().equals("Individual")) {
                 filename = txtInput.getText();
                 File file = new File(filename);
                 if(file.exists()) {
@@ -261,7 +275,7 @@ public class gui extends Application {
                     txtInput.setText("File Not Found!");
                     sendMessage();
                 }
-            }
+            }*/
         });
 
         try {
@@ -276,6 +290,7 @@ public class gui extends Application {
                 password = pop.password;
                 out = pop.out;
                 in = pop.in;
+                socket = pop.socket;
             }
             else
                 System.out.print("Cancelled\n");
@@ -293,8 +308,7 @@ public class gui extends Application {
         HBox box = new HBox();
         box.paddingProperty().setValue(new Insets(10, 10, 10, 10));
 
-        if (alignToRight)
-            box.setAlignment(Pos.BASELINE_RIGHT);
+        if (alignToRight) box.setAlignment(Pos.BASELINE_RIGHT);
         Label label = new Label(text);
         label.setWrapText(true);
         box.getChildren().add(label);
@@ -310,6 +324,8 @@ public class gui extends Application {
                 sendString(username, out);
                 String path = text.substring(6);
                 uploadFile(path);
+
+                sendFile(text);
             }
             else {
                 children.add(messageNode(text, true));
@@ -324,14 +340,66 @@ public class gui extends Application {
 
     private void sendGroupMessage() {
         Platform.runLater(() -> {
+
             String text = txtInput.getText();
             txtInput.clear();
-            children.add(messageNode(text, true));
-            sendString(header[2] , out);
-            sendString("send", out);
+            if (text.contains("!file:")) {
+                sendString(header[4] , out);
+                sendString(username, out);
+                String path = text.substring(6);
+                uploadFile(path);
+
+                sendGroupFile(text);
+            }
+            else {
+                children.add(messageNode(text, true));
+                sendString(header[2] , out);
+                sendString("send", out);
+                sendString(receiver, out);
+                sendString(username+":"+ text, out);
+            }
+        });
+    }
+
+    private void sendFileMessage() {
+        Platform.runLater(() -> {
+            String text = "!file:"+ txtInput.getText();
+            txtInput.clear();
+            sendString(header[4] , out);
+            sendString(username, out);
+            String path = text.substring(6);
+            uploadFile(path);
+
+            sendFile(text);
+        });
+    }
+
+    private void sendFileGroupMessage() {
+        Platform.runLater(() -> {
+            String text = "!file:" + txtInput.getText();
+            txtInput.clear();
+            sendString(header[4] , out);
+            sendString(username, out);
+            String path = text.substring(6);
+            uploadFile(path);
+
+            sendGroupFile(text);
+        });
+    }
+
+    private void sendFile(String text) {
+        Platform.runLater(() -> {
+            sendString(header[1], out);
             sendString(receiver, out);
-            if (text.contains("!file:")) sendString(text, out);
-            else sendString(username+":"+ text, out);
+            sendString(username + ":" + text, out);
+        });
+    }
+
+    private void sendGroupFile(String text) {
+        Platform.runLater(() -> {
+            sendString(header[1], out);
+            sendString(receiver, out);
+            sendString(username + ":" + text, out);
         });
     }
 
@@ -523,8 +591,6 @@ public class gui extends Application {
 
     private void changeDm(int dms) {
         children.clear();
-        System.out.println(dmList[dms][0]);
-        System.out.println(dmList[dms].length);
         for(int i = 1; i < dmList[dms].length; i++) {
             children.add(messageNode(dmList[dms][i], false));
         }
@@ -532,12 +598,11 @@ public class gui extends Application {
 
     private void changeGroup(int dms) {
         children.clear();
-        System.out.println(groupList[dms][0]);
-        System.out.println(groupList[dms].length);
         for(int i = 1; i < groupList[dms].length; i++) children.add(messageNode(groupList[dms][i], false));
     }
 
     public static void main(String[] args) throws IOException {
+        Scanner sc = new Scanner(System.in);
         launch(args);
     }
 }
