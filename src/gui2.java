@@ -307,14 +307,9 @@ public class gui2 extends Application {
             txtInput.clear();
             if (text.contains("!file:")) {
                 sendString(header[4] , out);
-                sendString(receiver, out);
                 sendString(username, out);
                 String path = text.substring(6);
                 uploadFile(path);
-
-                sendString(header[1] , out);
-                sendString(receiver, out);
-                sendString(username+":"+ text, out);
             }
             else {
                 children.add(messageNode(text, true));
