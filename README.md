@@ -1,6 +1,6 @@
 # Communication application
 
-This is a simple communication application that allows you to send messages to other users.
+This is a simple communication application that allows you to send messages to other users with GUI
 
 | Class  |                                                                                                                                                                                     Description                                                                                                                                                                                      |
 | ------ | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
